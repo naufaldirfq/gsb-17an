@@ -32,7 +32,7 @@ export default async function LombaList() {
             const canRegister = isOpen && !isFull;
 
             return (
-              <div key={comp.id} className="bg-surface border border-arang/10 rounded-[12px] p-5 flex flex-col gap-4">
+              <div key={comp.id} className="bg-surface border border-border rounded-[12px] p-5 flex flex-col gap-4">
                 <div>
                   <h2 className="font-anton text-2xl text-merah tracking-wide">{comp.name}</h2>
                   <div className="flex items-center gap-2 mt-2">

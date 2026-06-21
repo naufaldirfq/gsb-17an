@@ -1,43 +1,69 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useTransition } from "react";
 import { registerAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, RegisterFormData } from "@/lib/validations";
 
 export function RegistrationForm({ competitionId }: { competitionId: string }) {
-  const [state, formAction, isPending] = useActionState(registerAction, null);
+  const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (state) {
-      if (state.error) {
-        toast.error(state.message);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      competitionId,
+      name: "",
+      houseBlock: "",
+      houseNumber: "",
+      phone: "",
+    },
+  });
+
+  const onSubmit = (data: RegisterFormData) => {
+    startTransition(async () => {
+      // Build FormData to pass to action
+      const formData = new FormData();
+      formData.append("competitionId", data.competitionId);
+      formData.append("name", data.name);
+      formData.append("houseBlock", data.houseBlock);
+      formData.append("houseNumber", data.houseNumber);
+      formData.append("phone", data.phone);
+
+      const result = await registerAction(null, formData);
+
+      if (result.error) {
+        toast.error(result.message);
       } else {
-        toast.success(state.message);
-        // Optionally reset form here
-        const form = document.getElementById("registration-form") as HTMLFormElement;
-        if (form) form.reset();
+        toast.success(result.message);
+        reset();
       }
-    }
-  }, [state]);
+    });
+  };
 
   return (
-    <form id="registration-form" action={formAction} className="flex flex-col gap-5 mt-6">
-      <input type="hidden" name="competitionId" value={competitionId} />
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 mt-6">
+      <input type="hidden" {...register("competitionId")} />
       
       <div className="flex flex-col gap-2">
         <Label htmlFor="name" className="text-arang font-semibold">Nama Lengkap</Label>
         <Input 
           id="name" 
-          name="name" 
           placeholder="Budi Santoso" 
           className="border-arang/20 focus-visible:ring-merah"
-          required
+          {...register("name")}
         />
-        {state?.error && state.fieldErrors?.name && (
-          <p className="text-merah-tua text-xs">{state.fieldErrors.name[0]}</p>
+        {errors.name && (
+          <p className="text-merah-tua text-xs">{errors.name.message}</p>
         )}
       </div>
 
@@ -46,26 +72,24 @@ export function RegistrationForm({ competitionId }: { competitionId: string }) {
           <Label htmlFor="houseBlock" className="text-arang font-semibold">Blok Rumah</Label>
           <Input 
             id="houseBlock" 
-            name="houseBlock" 
             placeholder="C3" 
             className="border-arang/20 focus-visible:ring-merah"
-            required
+            {...register("houseBlock")}
           />
-          {state?.error && state.fieldErrors?.houseBlock && (
-            <p className="text-merah-tua text-xs">{state.fieldErrors.houseBlock[0]}</p>
+          {errors.houseBlock && (
+            <p className="text-merah-tua text-xs">{errors.houseBlock.message}</p>
           )}
         </div>
         <div className="flex flex-col gap-2 flex-1">
           <Label htmlFor="houseNumber" className="text-arang font-semibold">Nomor</Label>
           <Input 
             id="houseNumber" 
-            name="houseNumber" 
             placeholder="12A" 
             className="border-arang/20 focus-visible:ring-merah"
-            required
+            {...register("houseNumber")}
           />
-          {state?.error && state.fieldErrors?.houseNumber && (
-            <p className="text-merah-tua text-xs">{state.fieldErrors.houseNumber[0]}</p>
+          {errors.houseNumber && (
+            <p className="text-merah-tua text-xs">{errors.houseNumber.message}</p>
           )}
         </div>
       </div>
@@ -74,14 +98,13 @@ export function RegistrationForm({ competitionId }: { competitionId: string }) {
         <Label htmlFor="phone" className="text-arang font-semibold">Nomor WhatsApp</Label>
         <Input 
           id="phone" 
-          name="phone" 
           type="tel"
           placeholder="08123456789" 
           className="border-arang/20 focus-visible:ring-merah"
-          required
+          {...register("phone")}
         />
-        {state?.error && state.fieldErrors?.phone && (
-          <p className="text-merah-tua text-xs">{state.fieldErrors.phone[0]}</p>
+        {errors.phone && (
+          <p className="text-merah-tua text-xs">{errors.phone.message}</p>
         )}
       </div>
 

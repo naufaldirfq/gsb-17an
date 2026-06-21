@@ -58,20 +58,20 @@ export default async function LombaDetail({
         </div>
 
         {competition.description && (
-          <div className="bg-surface border border-arang/10 rounded-[12px] p-5">
+          <div className="bg-surface border border-border rounded-[12px] p-5">
             <h3 className="font-anton text-xl text-arang tracking-wide mb-2">Deskripsi</h3>
             <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.description}</p>
           </div>
         )}
 
         {competition.rules && (
-          <div className="bg-surface border border-arang/10 rounded-[12px] p-5">
+          <div className="bg-surface border border-border rounded-[12px] p-5">
             <h3 className="font-anton text-xl text-arang tracking-wide mb-2">Peraturan Lomba</h3>
             <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.rules}</p>
           </div>
         )}
 
-        <div className="bg-surface border border-arang/10 rounded-[12px] p-5">
+        <div className="bg-surface border border-border rounded-[12px] p-5">
           <h3 className="font-anton text-2xl text-arang tracking-wide">Pendaftaran</h3>
           {!canRegister ? (
             <div className="mt-4 p-4 bg-merah/10 text-merah-tua rounded-lg text-sm font-medium text-center border border-merah/20">
@@ -82,7 +82,7 @@ export default async function LombaDetail({
           )}
         </div>
 
-        <div className="bg-surface border border-arang/10 rounded-[12px] p-5">
+        <div className="bg-surface border border-border rounded-[12px] p-5">
           <h3 className="font-anton text-xl text-arang tracking-wide mb-4">Daftar Peserta ({competition._count.registrations})</h3>
           {competition.registrations.length === 0 ? (
             <p className="text-sm text-arang/60 text-center py-4">Belum ada peserta yang mendaftar.</p>

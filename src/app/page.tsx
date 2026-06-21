@@ -28,11 +28,12 @@ export default async function Home() {
         </div>
 
         <div className="mt-8 w-full flex flex-col items-center">
+          <p className="font-anton text-arang/60 text-lg mb-2">MENUJU 17 AGUSTUS</p>
           <Countdown />
         </div>
 
         {competitions.length > 0 && (
-          <div className="mt-8 w-full text-left bg-surface border border-arang/10 rounded-[12px] p-5">
+          <div className="mt-8 w-full text-left bg-surface border border-border rounded-[12px] p-5">
             <h2 className="font-anton text-2xl text-merah mb-3">LINEUP LOMBA</h2>
             <ul className="flex flex-col gap-2">
               {competitions.map(comp => (

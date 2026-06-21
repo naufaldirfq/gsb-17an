@@ -1,18 +1,8 @@
 "use server";
 
-import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-
-const phoneRegex = /^(?:\+62|08)[0-9]{7,13}$/;
-
-const registerSchema = z.object({
-  competitionId: z.string().min(1),
-  name: z.string().min(2, "Nama minimal 2 karakter"),
-  houseBlock: z.string().min(1, "Blok rumah wajib diisi"),
-  houseNumber: z.string().min(1, "Nomor rumah wajib diisi"),
-  phone: z.string().regex(phoneRegex, "Nomor HP harus diawali dengan 08 atau +62"),
-});
+import { registerSchema } from "@/lib/validations";
 
 export async function registerAction(prevState: unknown, formData: FormData) {
   try {
