@@ -43,6 +43,11 @@ export async function registerAction(prevState: unknown, formData: FormData) {
       return { error: true, message: "Pendaftaran lomba ini sudah ditutup." };
     }
 
+    // Check capacity
+    // NOTE: There is a known limitation here regarding race conditions.
+    // In a high-concurrency scenario, multiple requests might pass this check simultaneously 
+    // before the registrations are created, potentially exceeding the maxParticipants.
+    // A more robust solution would involve a database transaction with a row lock on the competition.
     if (competition.maxParticipants && competition._count.registrations >= competition.maxParticipants) {
       return { error: true, message: "Kuota pendaftaran sudah penuh." };
     }

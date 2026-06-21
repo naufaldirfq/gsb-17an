@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-
-export const dynamic = "force-dynamic";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default async function LombaList() {
   const competitions = await prisma.competition.findMany({
@@ -32,40 +31,33 @@ export default async function LombaList() {
             const canRegister = isOpen && !isFull;
 
             return (
-              <div key={comp.id} className="bg-surface border border-border rounded-[12px] p-5 flex flex-col gap-4">
-                <div>
-                  <h2 className="font-anton text-2xl text-merah tracking-wide">{comp.name}</h2>
+              <Card key={comp.id} className="border-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="font-anton text-2xl text-merah tracking-wide">{comp.name}</CardTitle>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
-                      {comp.teamSize === 1 ? "Perorangan" : `${comp.teamSize} Orang/Tim`}
+                    <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
+                      {comp.teamSize === 1 ? "Perorangan" : `${comp.teamSize} Orang`}
                     </span>
-                    {comp.maxParticipants && (
-                      <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
-                        {comp._count.registrations} / {comp.maxParticipants} Kuota
-                      </span>
-                    )}
+                    <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
+                      Kuota: {comp._count.registrations}/{comp.maxParticipants || '∞'}
+                    </span>
                   </div>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4">
                   {comp.description && (
-                    <p className="text-sm text-arang/80 mt-3 line-clamp-2">{comp.description}</p>
+                    <p className="text-sm text-arang/80 line-clamp-2">{comp.description}</p>
                   )}
-                </div>
-
-                {canRegister ? (
-                  <Link 
-                    href={`/lomba/${comp.slug}`}
-                    className="inline-flex items-center justify-center w-full rounded-[12px] font-bold bg-merah hover:bg-merah-tua text-putih-kertas py-2 transition-colors"
-                  >
-                    Daftar Sekarang
-                  </Link>
-                ) : (
-                  <button 
-                    disabled
-                    className="w-full rounded-[12px] font-bold bg-arang/20 text-arang/50 cursor-not-allowed py-2"
-                  >
-                    {isFull ? "Kuota Penuh" : "Pendaftaran Ditutup"}
-                  </button>
-                )}
-              </div>
+                  {canRegister ? (
+                    <Link href={`/lomba/${comp.slug}`} className="w-full inline-block text-center bg-merah hover:bg-merah-tua text-putih-kertas py-3 rounded-[12px] font-bold transition-colors">
+                      Daftar Sekarang
+                    </Link>
+                  ) : (
+                    <button disabled className="w-full text-center bg-arang/10 text-arang/50 py-3 rounded-[12px] font-bold cursor-not-allowed">
+                      {isFull ? "Kuota Penuh" : "Ditutup"}
+                    </button>
+                  )}
+                </CardContent>
+              </Card>
             );
           })}
 

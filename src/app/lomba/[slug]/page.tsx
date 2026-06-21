@@ -2,8 +2,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RegistrationForm } from "@/components/registration-form";
-
-export const dynamic = "force-dynamic";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default async function LombaDetail({
   params,
@@ -58,50 +57,66 @@ export default async function LombaDetail({
         </div>
 
         {competition.description && (
-          <div className="bg-surface border border-border rounded-[12px] p-5">
-            <h3 className="font-anton text-xl text-arang tracking-wide mb-2">Deskripsi</h3>
-            <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.description}</p>
-          </div>
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-anton text-xl text-arang tracking-wide">Deskripsi</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.description}</p>
+            </CardContent>
+          </Card>
         )}
 
         {competition.rules && (
-          <div className="bg-surface border border-border rounded-[12px] p-5">
-            <h3 className="font-anton text-xl text-arang tracking-wide mb-2">Peraturan Lomba</h3>
-            <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.rules}</p>
-          </div>
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-anton text-xl text-arang tracking-wide">Peraturan Lomba</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.rules}</p>
+            </CardContent>
+          </Card>
         )}
 
-        <div className="bg-surface border border-border rounded-[12px] p-5">
-          <h3 className="font-anton text-2xl text-arang tracking-wide">Pendaftaran</h3>
-          {!canRegister ? (
-            <div className="mt-4 p-4 bg-merah/10 text-merah-tua rounded-lg text-sm font-medium text-center border border-merah/20">
-              {isFull ? "Maaf, kuota pendaftaran sudah penuh." : "Maaf, pendaftaran belum dibuka atau sudah ditutup."}
-            </div>
-          ) : (
-            <RegistrationForm competitionId={competition.id} />
-          )}
-        </div>
+        <Card className="border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-anton text-2xl text-arang tracking-wide">Pendaftaran</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!canRegister ? (
+              <div className="p-4 bg-merah/10 text-merah-tua rounded-lg text-sm font-medium text-center border border-merah/20">
+                {isFull ? "Maaf, kuota pendaftaran sudah penuh." : "Pendaftaran untuk lomba ini sudah ditutup."}
+              </div>
+            ) : (
+              <RegistrationForm competitionId={competition.id} />
+            )}
+          </CardContent>
+        </Card>
 
-        <div className="bg-surface border border-border rounded-[12px] p-5">
-          <h3 className="font-anton text-xl text-arang tracking-wide mb-4">Daftar Peserta ({competition._count.registrations})</h3>
-          {competition.registrations.length === 0 ? (
-            <p className="text-sm text-arang/60 text-center py-4">Belum ada peserta yang mendaftar.</p>
-          ) : (
-            <ul className="flex flex-col gap-3">
-              {competition.registrations.map((reg, idx) => (
-                <li key={reg.id} className="flex justify-between items-center pb-3 border-b border-arang/5 last:border-0 last:pb-0">
-                  <div className="flex items-center gap-3">
-                    <span className="font-jetbrains text-merah/60 font-bold text-sm w-4">{idx + 1}.</span>
-                    <span className="font-medium text-arang">{reg.participant.name}</span>
-                  </div>
-                  <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
-                    Blok {reg.participant.houseBlock}-{reg.participant.houseNumber}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <Card className="border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-anton text-xl text-arang tracking-wide">Daftar Peserta ({competition._count.registrations})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {competition.registrations.length === 0 ? (
+              <p className="text-sm text-arang/60 text-center py-4">Belum ada peserta yang mendaftar.</p>
+            ) : (
+              <ul className="flex flex-col gap-3">
+                {competition.registrations.map((reg, idx) => (
+                  <li key={reg.id} className="flex justify-between items-center pb-3 border-b border-arang/5 last:border-0 last:pb-0">
+                    <div className="flex items-center gap-3">
+                      <span className="font-jetbrains text-merah/60 font-bold text-sm w-4">{idx + 1}.</span>
+                      <span className="font-medium text-arang">{reg.participant.name}</span>
+                    </div>
+                    <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
+                      Blok {reg.participant.houseBlock}-{reg.participant.houseNumber}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
 
       </div>
     </main>

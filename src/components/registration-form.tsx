@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useActionState, useRef, useEffect } from "react";
 import { registerAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,15 +11,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormData } from "@/lib/validations";
 
 export function RegistrationForm({ competitionId }: { competitionId: string }) {
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(registerAction, null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     register,
-    handleSubmit,
+    trigger,
     formState: { errors },
-    reset,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    mode: "onChange",
     defaultValues: {
       competitionId,
       name: "",
@@ -29,29 +30,29 @@ export function RegistrationForm({ competitionId }: { competitionId: string }) {
     },
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    startTransition(async () => {
-      // Build FormData to pass to action
-      const formData = new FormData();
-      formData.append("competitionId", data.competitionId);
-      formData.append("name", data.name);
-      formData.append("houseBlock", data.houseBlock);
-      formData.append("houseNumber", data.houseNumber);
-      formData.append("phone", data.phone);
-
-      const result = await registerAction(null, formData);
-
-      if (result.error) {
-        toast.error(result.message);
+  useEffect(() => {
+    if (state && !isPending) {
+      if (state.error) {
+        toast.error(state.message, { id: "action-error" });
       } else {
-        toast.success(result.message);
-        reset();
+        toast.success(state.message, { id: "action-success" });
+        formRef.current?.reset();
       }
-    });
-  };
+    }
+  }, [state, isPending]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 mt-6">
+    <form 
+      ref={formRef}
+      action={formAction} 
+      onSubmit={async (e) => {
+        const isValid = await trigger();
+        if (!isValid) {
+          e.preventDefault(); // Prevent server action if client validation fails
+        }
+      }}
+      className="flex flex-col gap-5 mt-6"
+    >
       <input type="hidden" {...register("competitionId")} />
       
       <div className="flex flex-col gap-2">

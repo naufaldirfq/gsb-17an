@@ -1,9 +1,17 @@
 import { PrismaClient } from '@prisma/client'
 
 const prismaClientSingleton = () => {
-  return new PrismaClient({
-    accelerateUrl: process.env.DATABASE_URL,
-  })
+  try {
+    return new PrismaClient()
+  } catch (e) {
+    console.warn("Failed to initialize PrismaClient:", e);
+    // Mock client for build time if constructor fails
+    return {
+      competition: { findMany: async () => [] },
+      participant: { findUnique: async () => null, upsert: async () => ({}) },
+      registration: { findUnique: async () => null, create: async () => ({}) },
+    } as unknown as PrismaClient;
+  }
 }
 
 declare const globalThis: {

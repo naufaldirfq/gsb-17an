@@ -2,8 +2,7 @@ import { BuntingStrip } from "@/components/bunting-strip";
 import { Countdown } from "@/components/countdown";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-
-export const dynamic = "force-dynamic";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default async function Home() {
   const competitions = await prisma.competition.findMany({
@@ -33,19 +32,23 @@ export default async function Home() {
         </div>
 
         {competitions.length > 0 && (
-          <div className="mt-8 w-full text-left bg-surface border border-border rounded-[12px] p-5">
-            <h2 className="font-anton text-2xl text-merah mb-3">LINEUP LOMBA</h2>
-            <ul className="flex flex-col gap-2">
-              {competitions.map(comp => (
-                <li key={comp.id} className="flex justify-between items-center pb-2 border-b border-arang/5 last:border-0 last:pb-0">
-                  <span className="font-medium text-arang">{comp.name}</span>
-                  <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
-                    {comp.teamSize === 1 ? "Perorangan" : `${comp.teamSize} Orang`}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <Card className="mt-8 w-full border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="font-anton text-2xl text-merah">LINEUP LOMBA</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="flex flex-col gap-2">
+                {competitions.map(comp => (
+                  <li key={comp.id} className="flex justify-between items-center bg-surface border border-arang/10 p-3 rounded-md">
+                    <span className="font-semibold text-arang">{comp.name}</span>
+                    <span className="text-sm font-jetbrains bg-arang/5 text-arang px-2 py-1 rounded">
+                      {comp.teamSize === 1 ? 'Perorangan' : comp.teamSize === 2 ? 'Ganda' : `${comp.teamSize}v${comp.teamSize}`}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
         )}
 
         <div className="mt-6 w-full mb-12">
