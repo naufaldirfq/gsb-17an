@@ -119,4 +119,7 @@
     page-break-after: always;
     break-after: page;
   }
+  table, th, td {
+    border-color: #666666 !important;
+  }
 }

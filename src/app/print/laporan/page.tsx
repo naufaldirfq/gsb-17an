@@ -4,14 +4,8 @@ import { AutoPrint } from "@/components/auto-print";
 export const dynamic = "force-dynamic";
 
 export default async function OverallReportPrintPage() {
-  const competitions = await prisma.competition.findMany({
-    include: {
-      registrations: { include: { participant: true } },
-      teams: true,
-    }
-  });
-
-  const participants = await prisma.participant.findMany();
+  const totalCompetitions = await prisma.competition.count();
+  const totalParticipants = await prisma.participant.count();
 
   // Group wins by houseBlock to build a leaderboard
   const blockScores: Record<string, { gold: number }> = {};
@@ -66,11 +60,11 @@ export default async function OverallReportPrintPage() {
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="border p-4 text-center">
           <p className="text-sm uppercase text-gray-600">Total Lomba</p>
-          <p className="text-2xl font-bold">{competitions.length}</p>
+          <p className="text-2xl font-bold">{totalCompetitions}</p>
         </div>
         <div className="border p-4 text-center">
           <p className="text-sm uppercase text-gray-600">Total Peserta Terdaftar</p>
-          <p className="text-2xl font-bold">{participants.length}</p>
+          <p className="text-2xl font-bold">{totalParticipants}</p>
         </div>
         <div className="border p-4 text-center">
           <p className="text-sm uppercase text-gray-600">Lomba Selesai</p>

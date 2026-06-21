@@ -4,6 +4,26 @@ import { AutoPrint } from "@/components/auto-print";
 
 export const dynamic = "force-dynamic";
 
+function formatStatus(status: string) {
+  const map: Record<string, string> = {
+    DRAFT: "Draft",
+    REGISTRATION: "Pendaftaran dibuka",
+    LOCKED: "Pendaftaran ditutup",
+    ONGOING: "Sedang Berlangsung",
+    DONE: "Selesai",
+  };
+  return map[status] || status;
+}
+
+function formatPairingMode(mode: string) {
+  const map: Record<string, string> = {
+    SOLO: "Perorangan",
+    RANDOM: "Acak (Ganda/Tim)",
+    MANUAL: "Manual",
+  };
+  return map[mode] || mode;
+}
+
 export default async function CompetitionPrintPage({
   params,
 }: {
@@ -30,8 +50,8 @@ export default async function CompetitionPrintPage({
 
       <div className="mb-6">
         <h2 className="text-lg font-bold border-b pb-1 mb-2">Informasi Umum</h2>
-        <p className="text-sm"><strong>Status:</strong> {comp.status}</p>
-        <p className="text-sm"><strong>Tipe Pasangan:</strong> {comp.pairingMode}</p>
+        <p className="text-sm"><strong>Status:</strong> {formatStatus(comp.status)}</p>
+        <p className="text-sm"><strong>Tipe Pasangan:</strong> {formatPairingMode(comp.pairingMode)}</p>
         <p className="text-sm"><strong>Ukuran Tim:</strong> {comp.teamSize} orang</p>
         {comp.description && <p className="text-sm mt-2"><strong>Deskripsi:</strong> {comp.description}</p>}
       </div>
@@ -41,10 +61,9 @@ export default async function CompetitionPrintPage({
         <table className="w-full border-collapse border text-sm">
           <thead>
             <tr className="bg-gray-100 text-left">
-              <th className="border p-2">No</th>
+              <th className="border p-2 w-16">No</th>
               <th className="border p-2">Nama</th>
               <th className="border p-2">Blok/No. Rumah</th>
-              <th className="border p-2">No. HP / WA</th>
             </tr>
           </thead>
           <tbody>
@@ -53,7 +72,6 @@ export default async function CompetitionPrintPage({
                 <td className="border p-2">{idx + 1}</td>
                 <td className="border p-2 font-medium">{reg.participant.name}</td>
                 <td className="border p-2">{reg.participant.houseBlock} - {reg.participant.houseNumber}</td>
-                <td className="border p-2">{reg.participant.phone}</td>
               </tr>
             ))}
           </tbody>
@@ -79,8 +97,15 @@ export default async function CompetitionPrintPage({
                   {m.teamA?.name || "?"} vs {m.teamB?.name || "?"}
                 </td>
                 <td className="border p-2">
-                  {m.court ? `${m.court}` : ""}
-                  {m.scheduledAt ? ` (${new Date(m.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" })})` : "Belum dijadwalkan"}
+                  {m.court || m.scheduledAt ? (
+                    <>
+                      {m.court && <span>{m.court}</span>}
+                      {m.court && m.scheduledAt && " • "}
+                      {m.scheduledAt && <span>{new Date(m.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" })}</span>}
+                    </>
+                  ) : (
+                    <span className="text-gray-400 italic">Belum dijadwalkan</span>
+                  )}
                 </td>
                 <td className="border p-2">
                   {m.status === "COMPLETED" ? (
