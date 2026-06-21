@@ -8,8 +8,7 @@ import { MatchStatus, Slot } from "@prisma/client";
 
 async function verifyAuth() {
   const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
-  const expectedPassword = process.env.ADMIN_PASSWORD || "admin123";
-  if (authCookie?.value !== expectedPassword) {
+  if (authCookie?.value !== "authenticated") {
     throw new Error("Unauthorized");
   }
 }
@@ -262,7 +261,18 @@ export async function submitScoreAction(matchId: string, payload: { scoreA: numb
 
     if (!match) return { error: "Match not found" };
 
+    if (payload.winnerTeamId !== match.teamAId && payload.winnerTeamId !== match.teamBId) {
+      return { error: "Invalid winner team ID" };
+    }
+
     await prisma.$transaction(async (tx) => {
+      if (match.nextMatchId) {
+        const nextMatch = await tx.match.findUnique({ where: { id: match.nextMatchId } });
+        if (nextMatch?.status === "COMPLETED") {
+          throw new Error("Cannot overwrite a completed next match.");
+        }
+      }
+
       // 1. Update the current match
       await tx.match.update({
         where: { id: matchId },
@@ -297,8 +307,8 @@ export async function submitScoreAction(matchId: string, payload: { scoreA: numb
     revalidatePath(`/admin/lomba/[slug]`, "page");
     revalidatePath(`/lomba/[slug]/bagan`, "page");
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to submit score:", error);
-    return { error: "Failed to submit score." };
+    return { error: error.message || "Failed to submit score." };
   }
 }

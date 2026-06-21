@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { submitScoreAction } from "./actions";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 
 type MatchData = {
   id: string;
@@ -53,7 +55,7 @@ export function MatchScoreModal({ match }: { match: MatchData }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!winnerTeamId) return alert("Please select a winner");
+    if (!winnerTeamId) return toast.error("Please select a winner");
 
     setIsSubmitting(true);
     try {
@@ -64,14 +66,15 @@ export function MatchScoreModal({ match }: { match: MatchData }) {
       });
 
       if (res.error) {
-        alert(res.error);
+        toast.error(res.error);
       } else {
+        toast.success("Score updated successfully");
         setOpen(false);
         router.refresh();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Something went wrong");
+      toast.error(err.message || "Something went wrong");
     } finally {
       setIsSubmitting(false);
     }
@@ -79,11 +82,8 @@ export function MatchScoreModal({ match }: { match: MatchData }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {/* @ts-ignore */}
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="border-merah text-merah hover:bg-merah/10">
-          Update Score
-        </Button>
+      <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-merah bg-transparent shadow-sm hover:bg-merah/10 hover:text-merah text-merah h-8 px-3">
+        Update Score
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

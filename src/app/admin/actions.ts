@@ -8,7 +8,7 @@ export async function loginAction(prevState: unknown, formData: FormData) {
   const password = formData.get("password");
   const expectedPassword = process.env.ADMIN_PASSWORD || "admin123";
   if (password === expectedPassword) {
-    (await cookies()).set(ADMIN_AUTH_COOKIE, expectedPassword, { path: "/" });
+    (await cookies()).set(ADMIN_AUTH_COOKIE, "authenticated", { path: "/" });
     redirect("/admin");
   }
   return { error: "Invalid password" };
