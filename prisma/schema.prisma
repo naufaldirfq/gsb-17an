@@ -42,9 +42,11 @@ model Participant {
   name          String
   houseBlock    String // Blok, e.g. "C3"
   houseNumber   String // Nomor rumah
-  phone         String         @unique // WhatsApp; doubles as a soft identity
+  phone         String         // WhatsApp; doubles as a soft identity
   createdAt     DateTime       @default(now())
   registrations Registration[]
+
+  @@unique([name, phone])
 }
 
 model Registration {

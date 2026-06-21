@@ -6,15 +6,19 @@ import { generateBracketAction } from "./actions";
 
 export function BracketActions({
   competitionId,
-  isLocked,
+  status,
 }: {
   competitionId: string;
-  isLocked: boolean;
+  status: string;
 }) {
   const [isPending, startTransition] = useTransition();
 
   const handleGenerate = () => {
-    if (!confirm("Acak Tim & Buat Bagan sekarang? Tindakan ini akan menghapus data tim dan match sebelumnya jika ada.")) return;
+    const confirmMessage = status === "LOCKED"
+      ? "Acak Tim & Buat Bagan sekarang? Tindakan ini akan menghapus data tim dan match sebelumnya jika ada."
+      : "Regenerasi bagan sekarang? Tindakan ini akan mengacak ulang semua tim dan menghapus semua jadwal serta skor pertandingan yang sudah ada.";
+
+    if (!confirm(confirmMessage)) return;
     
     startTransition(async () => {
       const result = await generateBracketAction(competitionId);
@@ -26,16 +30,19 @@ export function BracketActions({
     });
   };
 
-  if (!isLocked) return null;
+  if (status === "REGISTRATION") return null;
+
+  const isLocked = status === "LOCKED";
+  const buttonText = isLocked ? "Acak Tim & Buat Bagan" : "Regenerasi Bagan 🔄";
 
   return (
     <Button 
       onClick={handleGenerate} 
       disabled={isPending}
-      variant="default"
-      className="bg-merah hover:bg-merah-tua text-putih-kertas"
+      variant={isLocked ? "default" : "outline"}
+      className={isLocked ? "bg-merah hover:bg-merah-tua text-putih-kertas font-bold" : "border-merah text-merah hover:bg-merah/10 font-bold"}
     >
-      {isPending ? "Memproses..." : "Acak Tim & Buat Bagan"}
+      {isPending ? "Memproses..." : buttonText}
     </Button>
   );
 }

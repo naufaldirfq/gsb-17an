@@ -52,17 +52,21 @@ export async function registerAction(prevState: unknown, formData: FormData) {
       return { error: true, message: "Kuota pendaftaran sudah penuh." };
     }
 
-    // Upsert participant by phone
+    // Upsert participant by name and phone
     const participant = await prisma.participant.upsert({
-      where: { phone },
+      where: {
+        name_phone: {
+          name,
+          phone,
+        },
+      },
       update: {
-        name,
         houseBlock,
         houseNumber,
       },
       create: {
-        phone,
         name,
+        phone,
         houseBlock,
         houseNumber,
       },
@@ -79,7 +83,7 @@ export async function registerAction(prevState: unknown, formData: FormData) {
     });
 
     if (existingRegistration) {
-      return { error: true, message: "Nomor HP ini sudah terdaftar di lomba ini." };
+      return { error: true, message: "Peserta dengan nama dan nomor WhatsApp ini sudah terdaftar di lomba ini." };
     }
 
     await prisma.registration.create({

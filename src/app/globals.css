@@ -71,7 +71,7 @@
   --secondary: #FAF6EE;
   --secondary-foreground: #1C1A19;
   --muted: #FAF6EE;
-  --muted-foreground: #1C1A19;
+  --muted-foreground: #1C1A1966; /* arang 40% opacity */
   --accent: #FAF6EE;
   --accent-foreground: #1C1A19;
   --destructive: #8E0C1B;

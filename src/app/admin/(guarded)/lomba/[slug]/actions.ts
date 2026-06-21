@@ -35,9 +35,6 @@ export async function openRegistrationAction(competitionId: string) {
     
     const comp = await prisma.competition.findUnique({ where: { id: competitionId } });
     if (!comp) return { error: "Competition not found" };
-    if (comp.status === "ONGOING" || comp.status === "DONE") {
-      return { error: "Cannot open registration after bracket has been generated." };
-    }
 
     await prisma.competition.update({
       where: { id: competitionId },
@@ -56,16 +53,22 @@ export async function generateBracketAction(competitionId: string) {
   try {
     await verifyAuth();
     
-    // Fetch competition and registrations
+    // Fetch competition and registrations with participant details
     const comp = await prisma.competition.findUnique({
       where: { id: competitionId },
       include: {
-        registrations: true,
+        registrations: {
+          include: {
+            participant: true,
+          },
+        },
       }
     });
 
     if (!comp) return { error: "Competition not found" };
-    if (comp.status !== "LOCKED") return { error: "Competition must be LOCKED to generate bracket" };
+    if (comp.status !== "LOCKED" && comp.status !== "ONGOING" && comp.status !== "DONE") {
+      return { error: "Pendaftaran harus ditutup terlebih dahulu sebelum membuat bagan." };
+    }
 
     // 1. Shuffle participants
     const regs = [...comp.registrations];
@@ -91,19 +94,35 @@ export async function generateBracketAction(competitionId: string) {
     for (let i = 0; i < numTeamsToForm; i++) {
       const teamId = crypto.randomUUID();
       const members = [];
+      const memberNames: string[] = [];
+
       for (let j = 0; j < teamSize; j++) {
+        const reg = regs[regIndex];
         members.push({
           id: crypto.randomUUID(),
           teamId: teamId,
-          registrationId: regs[regIndex].id
+          registrationId: reg.id
         });
+
+        const part = reg.participant;
+        const houseInfo = part.houseBlock && part.houseNumber
+          ? `${part.houseBlock}-${part.houseNumber}`
+          : (part.houseBlock || part.houseNumber || "");
+
+        const formattedName = houseInfo
+          ? `${part.name} ${houseInfo}`
+          : part.name;
+
+        memberNames.push(formattedName);
         regIndex++;
       }
+      
+      const teamName = memberNames.join(" X ");
       
       newTeams.push({
         id: teamId,
         competitionId: comp.id,
-        name: `Tim ${i + 1}`,
+        name: teamName,
         members
       });
     }

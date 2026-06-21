@@ -50,7 +50,6 @@ export default async function CompetitionManagePage({
   if (!comp) return notFound();
 
   const isRegistration = comp.status === "REGISTRATION";
-  const isLocked = comp.status === "LOCKED";
   const isOngoing = comp.status === "ONGOING" || comp.status === "DONE";
 
   return (
@@ -64,7 +63,7 @@ export default async function CompetitionManagePage({
         </div>
         <div className="flex gap-4">
           <RegistrationActions competitionId={comp.id} isRegistration={isRegistration} />
-          <BracketActions competitionId={comp.id} isLocked={isLocked} />
+          <BracketActions competitionId={comp.id} status={comp.status} />
         </div>
       </div>
 
@@ -100,7 +99,7 @@ export default async function CompetitionManagePage({
         </Table>
       </div>
 
-      {isOngoing && (
+      {(isOngoing || comp.matches.length > 0 || comp.teams.length > 0) && (
         <div className="space-y-6 mt-8">
           <div className="bg-white rounded-lg shadow border border-gray-200">
             <div className="p-4 border-b border-gray-200">

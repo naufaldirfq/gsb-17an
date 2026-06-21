@@ -54,9 +54,9 @@ export default async function LombaList() {
                       Daftar Sekarang
                     </Link>
                   ) : (
-                    <button disabled className="w-full text-center bg-arang/10 text-arang/50 py-3 rounded-[12px] font-bold cursor-not-allowed">
-                      {isFull ? "Kuota Penuh" : "Ditutup"}
-                    </button>
+                    <Link href={`/lomba/${comp.slug}`} className="w-full inline-block text-center bg-arang/5 hover:bg-arang/10 text-arang/80 py-3 rounded-[12px] font-bold transition-colors">
+                      {isFull ? "Kuota Penuh (Lihat Detail)" : "Ditutup (Lihat Detail)"}
+                    </Link>
                   )}
                 </CardContent>
               </Card>
