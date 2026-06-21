@@ -56,6 +56,7 @@ model Team {
   members       TeamMember[]
   matchesAsA    Match[]      @relation("TeamA")
   matchesAsB    Match[]      @relation("TeamB")
+  matchesWon    Match[]      @relation("WinnerTeam")
 }
 
 model TeamMember {
@@ -67,24 +68,27 @@ model TeamMember {
 }
 
 model Match {
-  id            String      @id @default(cuid())
-  competitionId String
-  round         Int // 1 = first round
-  position      Int // index within the round (for layout + linking)
-  label         String? // "Final", "Semifinal", "Perebutan Juara 3"
-  teamAId       String?
-  teamBId       String?
-  scoreA        Int?
-  scoreB        Int?
-  winnerTeamId  String?
-  status        MatchStatus @default(PENDING)
-  nextMatchId   String? // where the winner flows
-  nextSlot      Slot? // into slot A or B of the next match
-  court         String? // "Lapangan 1"
-  scheduledAt   DateTime?
-  competition   Competition @relation(fields: [competitionId], references: [id])
-  teamA         Team?       @relation("TeamA", fields: [teamAId], references: [id])
-  teamB         Team?       @relation("TeamB", fields: [teamBId], references: [id])
+  id              String      @id @default(cuid())
+  competitionId   String
+  round           Int // 1 = first round
+  position        Int // index within the round (for layout + linking)
+  label           String? // "Final", "Semifinal", "Perebutan Juara 3"
+  teamAId         String?
+  teamBId         String?
+  scoreA          Int?
+  scoreB          Int?
+  winnerTeamId    String?
+  winnerTeam      Team?       @relation("WinnerTeam", fields: [winnerTeamId], references: [id])
+  status          MatchStatus @default(PENDING)
+  nextMatchId     String? // where the winner flows
+  nextMatch       Match?      @relation("MatchFlow", fields: [nextMatchId], references: [id])
+  previousMatches Match[]     @relation("MatchFlow")
+  nextSlot        Slot? // into slot A or B of the next match
+  court           String? // "Lapangan 1"
+  scheduledAt     DateTime?
+  competition     Competition @relation(fields: [competitionId], references: [id])
+  teamA           Team?       @relation("TeamA", fields: [teamAId], references: [id])
+  teamB           Team?       @relation("TeamB", fields: [teamBId], references: [id])
 }
 
 enum PairingMode {
