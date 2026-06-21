@@ -130,7 +130,7 @@ export default async function PublicBracketPage({
                             </div>
                           </div>
                           
-                          {/* Footer with Court/Schedule */}
+                          {/* Footer with Court/Schedule - Display schedule on Public Bracket if they exist */}
                           {(match.court || match.scheduledAt) && (
                             <div className="bg-arang/5 px-4 py-2 flex gap-4 border-t border-border text-xs text-arang/70">
                               {match.scheduledAt && (

@@ -28,6 +28,17 @@ export default async function LombaDetail({
           createdAt: "asc",
         },
       },
+      matches: {
+        include: {
+          teamA: true,
+          teamB: true,
+          winnerTeam: true,
+        },
+        orderBy: [
+          { round: "asc" },
+          { position: "asc" }
+        ]
+      }
     },
   });
 
@@ -97,6 +108,49 @@ export default async function LombaDetail({
               </div>
             ) : (
               <RegistrationForm competitionId={competition.id} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="font-anton text-xl text-arang tracking-wide">Jadwal & Hasil</CardTitle>
+            <Link href={`/lomba/${slug}/bagan`} className="text-xs font-semibold text-merah hover:underline">
+              Lihat Bagan &rarr;
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {competition.matches && competition.matches.filter(m => m.status !== "BYE").length === 0 ? (
+              <p className="text-sm text-arang/60 text-center py-4">Belum ada pertandingan dijadwalkan.</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {competition.matches
+                  .filter((m) => m.status !== "BYE")
+                  .map((match) => (
+                    <div key={match.id} className="p-3 border border-border rounded-lg bg-surface flex flex-col gap-2">
+                      <div className="flex justify-between items-center text-xs text-arang/60 font-semibold font-jetbrains">
+                        <span>{match.label || `Ronde ${match.round}`}</span>
+                        <span>Match {match.position + 1}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center text-sm">
+                        <span className={match.winnerTeamId === match.teamAId ? 'font-bold text-merah' : 'text-arang'}>
+                          {match.teamA?.name || "TBD"}
+                        </span>
+                        <span className="text-xs font-bold text-arang/40">VS</span>
+                        <span className={match.winnerTeamId === match.teamBId ? 'font-bold text-merah' : 'text-arang'}>
+                          {match.teamB?.name || "TBD"}
+                        </span>
+                      </div>
+
+                      {match.court && (
+                        <div className="text-xs text-arang/60 mt-1 font-medium bg-arang/5 py-0.5 px-1.5 rounded inline-block self-start">
+                          {match.court} {match.scheduledAt ? `• ${new Date(match.scheduledAt).toLocaleString("id-ID", { hour: "numeric", minute: "numeric" })}` : ""}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
             )}
           </CardContent>
         </Card>

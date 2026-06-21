@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { RegistrationActions } from "./registration-actions";
 import { BracketActions } from "./bracket-actions";
 import { MatchScoreModal } from "./match-score-modal";
+import { MatchScheduleModal } from "./match-schedule-modal";
 
 export const dynamic = "force-dynamic";
 
@@ -130,13 +131,14 @@ export default async function CompetitionManagePage({
               <h2 className="text-xl font-semibold text-arang">Daftar Pertandingan (Bagan)</h2>
             </div>
             <Table>
-              <TableHeader>
+               <TableHeader>
                 <TableRow>
                   <TableHead>Ronde</TableHead>
                   <TableHead>Posisi</TableHead>
                   <TableHead>Tim A</TableHead>
                   <TableHead>Tim B</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Jadwal</TableHead>
                   <TableHead>Aksi</TableHead>
                 </TableRow>
               </TableHeader>
@@ -154,7 +156,24 @@ export default async function CompetitionManagePage({
                       {match.winnerTeam && <span className="ml-2 text-sm text-green-600">Pemenang: {match.winnerTeam.name}</span>}
                     </TableCell>
                     <TableCell>
-                      {match.status !== "BYE" && <MatchScoreModal match={match} />}
+                      {match.court || match.scheduledAt ? (
+                        <div className="text-xs">
+                          <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
+                          <p className="text-gray-500">
+                            {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                          </p>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {match.status !== "BYE" && (
+                        <div className="flex gap-2">
+                          <MatchScheduleModal match={match} />
+                          <MatchScoreModal match={match} />
+                        </div>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

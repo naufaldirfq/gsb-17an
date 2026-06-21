@@ -313,3 +313,30 @@ export async function submitScoreAction(matchId: string, payload: { scoreA: numb
     return { error: message };
   }
 }
+
+export async function scheduleMatchAction(
+  matchId: string,
+  court: string,
+  scheduledAtRaw: string
+) {
+  const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
+  if (authCookie?.value !== "authenticated") {
+    return { error: "Unauthorized" };
+  }
+
+  try {
+    const scheduledAt = scheduledAtRaw ? new Date(scheduledAtRaw) : null;
+    await prisma.match.update({
+      where: { id: matchId },
+      data: { court, scheduledAt }
+    });
+    revalidatePath("/admin");
+    revalidatePath(`/admin/lomba/[slug]`, "page");
+    revalidatePath(`/lomba/[slug]`, "page");
+    revalidatePath(`/lomba/[slug]/bagan`, "page");
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Gagal menjadwalkan pertandingan" };
+  }
+}
