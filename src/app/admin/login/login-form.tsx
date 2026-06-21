@@ -12,7 +12,7 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="password">Password (admin123)</Label>
+        <Label htmlFor="password">Password</Label>
         <Input 
           id="password" 
           name="password" 
