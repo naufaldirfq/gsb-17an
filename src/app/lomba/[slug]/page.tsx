@@ -143,9 +143,11 @@ export default async function LombaDetail({
                         </span>
                       </div>
 
-                      {match.court && (
+                      {(match.court || match.scheduledAt) && (
                         <div className="text-xs text-arang/60 mt-1 font-medium bg-arang/5 py-0.5 px-1.5 rounded inline-block self-start">
-                          {match.court} {match.scheduledAt ? `• ${new Date(match.scheduledAt).toLocaleString("id-ID", { hour: "numeric", minute: "numeric" })}` : ""}
+                          {match.court || ""}
+                          {match.court && match.scheduledAt && " • "}
+                          {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
                         </div>
                       )}
                     </div>
