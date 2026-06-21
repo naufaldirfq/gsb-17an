@@ -72,9 +72,10 @@ export function MatchScoreModal({ match }: { match: MatchData }) {
         setOpen(false);
         router.refresh();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message || "Something went wrong");
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

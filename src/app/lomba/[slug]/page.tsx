@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RegistrationForm } from "@/components/registration-form";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { WhatsAppShare } from "./whatsapp-share";
 
 export default async function LombaDetail({
   params,
@@ -40,11 +41,16 @@ export default async function LombaDetail({
     <main className="flex flex-col items-center w-full min-h-screen px-6 py-12">
       <div className="max-w-md w-full flex flex-col gap-8">
         <div>
-          <Link href="/lomba" className="text-arang/60 text-sm font-medium hover:text-merah transition-colors">
+          <Link href="/lomba" className="text-arang/60 text-sm font-medium hover:text-merah transition-colors" aria-label="Kembali ke Daftar Lomba">
             &larr; Kembali ke Daftar
           </Link>
           <h1 className="font-anton text-4xl text-merah mt-4 tracking-wide">{competition.name}</h1>
-          <div className="flex items-center gap-2 mt-3">
+          
+          <div className="mt-4">
+            <WhatsAppShare competitionName={competition.name} />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 mt-4">
             <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
               {competition.teamSize === 1 ? "Perorangan" : `${competition.teamSize} Orang/Tim`}
             </span>

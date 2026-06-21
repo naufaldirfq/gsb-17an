@@ -307,8 +307,9 @@ export async function submitScoreAction(matchId: string, payload: { scoreA: numb
     revalidatePath(`/admin/lomba/[slug]`, "page");
     revalidatePath(`/lomba/[slug]/bagan`, "page");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to submit score:", error);
-    return { error: error.message || "Failed to submit score." };
+    const message = error instanceof Error ? error.message : "Failed to submit score.";
+    return { error: message };
   }
 }
