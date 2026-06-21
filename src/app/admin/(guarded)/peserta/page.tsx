@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 
 export default async function ParticipantsPage() {
   const participants = await prisma.participant.findMany({
+    take: 50,
     include: {
       registrations: {
         include: { competition: true }

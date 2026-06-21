@@ -1,5 +1,3 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { logoutAction } from "../actions";
 
@@ -8,10 +6,6 @@ export default async function AdminGuardedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const authCookie = (await cookies()).get("admin_auth");
-  if (authCookie?.value !== "true") {
-    redirect("/admin/login");
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-putih-kertas text-arang">

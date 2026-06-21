@@ -1,12 +1,6 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { LoginForm } from "./login-form";
 
 export default async function LoginPage() {
-  const authCookie = (await cookies()).get("admin_auth");
-  if (authCookie?.value === "true") {
-    redirect("/admin");
-  }
 
   return (
     <div className="min-h-screen bg-putih-kertas flex items-center justify-center p-4">

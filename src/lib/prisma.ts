@@ -8,7 +8,7 @@ const prismaClientSingleton = () => {
     // Mock client for build time if constructor fails
     return {
       competition: { findMany: async () => [], findUnique: async () => null },
-      participant: { findUnique: async () => null, upsert: async () => ({}) },
+      participant: { findMany: async () => [], findUnique: async () => null, upsert: async () => ({}) },
       registration: { findUnique: async () => null, create: async () => ({}) },
     } as unknown as PrismaClient;
   }

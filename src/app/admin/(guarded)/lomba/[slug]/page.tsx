@@ -9,8 +9,8 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { closeRegistrationAction, openRegistrationAction } from "./actions";
+import { RegistrationActions } from "./registration-actions";
+import { BracketActions } from "./bracket-actions";
 
 export default async function CompetitionManagePage({
   params,
@@ -24,6 +24,21 @@ export default async function CompetitionManagePage({
       registrations: {
         include: { participant: true },
         orderBy: { createdAt: 'asc' }
+      },
+      teams: {
+        include: { members: { include: { registration: { include: { participant: true } } } } },
+        orderBy: { name: 'asc' }
+      },
+      matches: {
+        orderBy: [
+          { round: 'asc' },
+          { position: 'asc' }
+        ],
+        include: {
+          teamA: true,
+          teamB: true,
+          winnerTeam: true
+        }
       }
     }
   });
@@ -31,6 +46,8 @@ export default async function CompetitionManagePage({
   if (!comp) return notFound();
 
   const isRegistration = comp.status === "REGISTRATION";
+  const isLocked = comp.status === "LOCKED";
+  const isOngoing = comp.status === "ONGOING" || comp.status === "DONE";
 
   return (
     <div className="space-y-6">
@@ -42,15 +59,8 @@ export default async function CompetitionManagePage({
           </p>
         </div>
         <div className="flex gap-4">
-          {isRegistration ? (
-            <form action={closeRegistrationAction.bind(null, comp.id)}>
-              <Button type="submit" variant="destructive">Tutup Pendaftaran (LOCKED)</Button>
-            </form>
-          ) : (
-            <form action={openRegistrationAction.bind(null, comp.id)}>
-              <Button type="submit" variant="outline">Buka Pendaftaran</Button>
-            </form>
-          )}
+          <RegistrationActions competitionId={comp.id} isRegistration={isRegistration} />
+          <BracketActions competitionId={comp.id} isLocked={isLocked} />
         </div>
       </div>
 
@@ -85,6 +95,67 @@ export default async function CompetitionManagePage({
           </TableBody>
         </Table>
       </div>
+
+      {isOngoing && (
+        <div className="space-y-6 mt-8">
+          <div className="bg-white rounded-lg shadow border border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-arang">Daftar Tim ({comp.teams.length})</h2>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nama Tim</TableHead>
+                  <TableHead>Anggota</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {comp.teams.map(team => (
+                  <TableRow key={team.id}>
+                    <TableCell className="font-medium">{team.name}</TableCell>
+                    <TableCell>
+                      {team.members.map(m => m.registration.participant.name).join(", ")}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="bg-white rounded-lg shadow border border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-arang">Daftar Pertandingan (Bagan)</h2>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Ronde</TableHead>
+                  <TableHead>Posisi</TableHead>
+                  <TableHead>Tim A</TableHead>
+                  <TableHead>Tim B</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {comp.matches.map(match => (
+                  <TableRow key={match.id}>
+                    <TableCell>{match.label || `Ronde ${match.round}`}</TableCell>
+                    <TableCell>Match {match.position + 1}</TableCell>
+                    <TableCell>{match.teamA?.name || "-"}</TableCell>
+                    <TableCell>{match.teamB?.name || "-"}</TableCell>
+                    <TableCell>
+                      <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
+                        {match.status}
+                      </Badge>
+                      {match.winnerTeam && <span className="ml-2 text-sm text-green-600">Pemenang: {match.winnerTeam.name}</span>}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,2075 +1,509 @@
-diff --git a/package-lock.json b/package-lock.json
-index 3b76440..4a97d56 100644
---- a/package-lock.json
-+++ b/package-lock.json
-@@ -1,36 +1,43 @@
- {
--  "name": "temp_app",
-+  "name": "gsb-lomba",
-   "version": "0.1.0",
-   "lockfileVersion": 3,
-   "requires": true,
-   "packages": {
-     "": {
--      "name": "temp_app",
-+      "name": "gsb-lomba",
-       "version": "0.1.0",
-       "dependencies": {
-         "@base-ui/react": "^1.6.0",
-+        "@hookform/resolvers": "^5.4.0",
-         "@prisma/client": "^7.8.0",
-         "class-variance-authority": "^0.7.1",
-         "clsx": "^2.1.1",
-         "lucide-react": "^1.21.0",
-         "next": "16.2.9",
-+        "next-themes": "^0.4.6",
-         "react": "19.2.4",
-         "react-dom": "19.2.4",
-+        "react-hook-form": "^7.80.0",
-         "shadcn": "^4.11.0",
-+        "sonner": "^2.0.7",
-         "tailwind-merge": "^3.6.0",
--        "tw-animate-css": "^1.4.0"
-+        "tw-animate-css": "^1.4.0",
-+        "zod": "^4.4.3"
-       },
-       "devDependencies": {
-         "@tailwindcss/postcss": "^4",
-         "@types/node": "^20",
-         "@types/react": "^19",
-         "@types/react-dom": "^19",
-+        "@vitest/ui": "^4.1.9",
-         "eslint": "^9",
-         "eslint-config-next": "16.2.9",
-         "prisma": "^7.8.0",
-         "tailwindcss": "^4",
-         "tsx": "^4.22.4",
--        "typescript": "^5"
-+        "typescript": "^5",
-+        "vitest": "^4.1.9"
-       }
-     },
-     "node_modules/@alloc/quick-lru": {
-@@ -1453,6 +1460,18 @@
-         "hono": "^4"
-       }
-     },
-+    "node_modules/@hookform/resolvers": {
-+      "version": "5.4.0",
-+      "resolved": "https://registry.npmjs.org/@hookform/resolvers/-/resolvers-5.4.0.tgz",
-+      "integrity": "sha512-EIsqr/t/qbinPIhGjMdtvutIN1Kk4uwbROE9/UQ93CAVGR7GkA7Y92+fX80OzXi/OB67jVFYwKGO1WzkxmkFZw==",
-+      "license": "MIT",
-+      "dependencies": {
-+        "@standard-schema/utils": "^0.3.0"
-+      },
-+      "peerDependencies": {
-+        "react-hook-form": "^7.55.0"
-+      }
-+    },
-     "node_modules/@humanfs/core": {
-       "version": "0.19.2",
-       "resolved": "https://registry.npmjs.org/@humanfs/core/-/core-0.19.2.tgz",
-@@ -2367,6 +2386,23 @@
-         "node": ">=12.4.0"
-       }
-     },
-+    "node_modules/@oxc-project/types": {
-+      "version": "0.133.0",
-+      "resolved": "https://registry.npmjs.org/@oxc-project/types/-/types-0.133.0.tgz",
-+      "integrity": "sha512-KzkdCd6Uxqnf6l3HOw1xfatAlUURA0g14cvBYFyJ5SaNOQbOUvBr9PKArcPcrNIeRsBdgcUzOGrhKveVpvOIGA==",
-+      "dev": true,
-+      "license": "MIT",
-+      "funding": {
-+        "url": "https://github.com/sponsors/Boshen"
-+      }
-+    },
-+    "node_modules/@polka/url": {
-+      "version": "1.0.0-next.29",
-+      "resolved": "https://registry.npmjs.org/@polka/url/-/url-1.0.0-next.29.tgz",
-+      "integrity": "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==",
-+      "dev": true,
-+      "license": "MIT"
-+    },
-     "node_modules/@prisma/client": {
-       "version": "7.8.0",
-       "resolved": "https://registry.npmjs.org/@prisma/client/-/client-7.8.0.tgz",
-@@ -2754,6 +2790,299 @@
-         }
-       }
-     },
-+    "node_modules/@rolldown/binding-android-arm64": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-android-arm64/-/binding-android-arm64-1.0.3.tgz",
-+      "integrity": "sha512-454rs7jHngixp/NMxd5srYD57OnzSlZ/eFTETjORQHLwJG1lRtmNOJcBerZlfu4GjKqeq8aCCIQrMdHyhI51Hw==",
-+      "cpu": [
-+        "arm64"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "android"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-darwin-arm64": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-darwin-arm64/-/binding-darwin-arm64-1.0.3.tgz",
-+      "integrity": "sha512-PcAhP+ynjURNyy8SKGl5DQP94aGuB/7JrXJb/t7P+hanXvQVMWzUvRRhBAcg/lNRadBhoUPqSoP4xw5tR/KBEA==",
-+      "cpu": [
-+        "arm64"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "darwin"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-darwin-x64": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-darwin-x64/-/binding-darwin-x64-1.0.3.tgz",
-+      "integrity": "sha512-9YpfeUvSE2RS7wysJ81uOZkXJz7f7Q55H2Gvp3VEw/EsahqDtrphrZ0EwDLK5vvKOzaCrBsjF8JmnMLcUt78Gg==",
-+      "cpu": [
-+        "x64"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "darwin"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-freebsd-x64": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-freebsd-x64/-/binding-freebsd-x64-1.0.3.tgz",
-+      "integrity": "sha512-yB1IlAsSNHncV6SCTL27/MVGR5htvQsoGxIv5KMGXALp+Ll1wYsn+x98M9MW7qa+NdSbvrrY7ANI4wLJ0n1e6g==",
-+      "cpu": [
-+        "x64"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "freebsd"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-linux-arm-gnueabihf": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm-gnueabihf/-/binding-linux-arm-gnueabihf-1.0.3.tgz",
-+      "integrity": "sha512-Yi30IVAAfLUCy2MseFjbB1jAMDl1VMCAas5StnYp8da9+CKvMd2H2cbEjWcw5NPaPqzvYkVIaF1nNUG+b7u/sw==",
-+      "cpu": [
-+        "arm"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "linux"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-linux-arm64-gnu": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm64-gnu/-/binding-linux-arm64-gnu-1.0.3.tgz",
-+      "integrity": "sha512-jsO7R8To+AdlYgUmN5sHSCZbfhtMBkO0WUx8iORQnPcMMdgr7qM2DQmMwgabs3GhNztdmoKkMKQFHD6DTMCIQw==",
-+      "cpu": [
-+        "arm64"
-+      ],
-+      "dev": true,
-+      "libc": [
-+        "glibc"
-+      ],
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "linux"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-linux-arm64-musl": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm64-musl/-/binding-linux-arm64-musl-1.0.3.tgz",
-+      "integrity": "sha512-VWkUHwWriDciit80wleYwKILoR/KMvxh/IdwS/paX+ZgpuRpCrKLUdadJbc0NpBEiyhpYawsJ73j9aCvOH+f7Q==",
-+      "cpu": [
-+        "arm64"
-+      ],
-+      "dev": true,
-+      "libc": [
-+        "musl"
-+      ],
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "linux"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-linux-ppc64-gnu": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-ppc64-gnu/-/binding-linux-ppc64-gnu-1.0.3.tgz",
-+      "integrity": "sha512-5f1laC0SlIR0yDbFCd8acUhvJIag6N3zC5P7oUPN6wX0aOma+uKJ0wBDH5aq7I1PVI2ttTlhJwzwRIBnLiSGEg==",
-+      "cpu": [
-+        "ppc64"
-+      ],
-+      "dev": true,
-+      "libc": [
-+        "glibc"
-+      ],
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "linux"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-linux-s390x-gnu": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-s390x-gnu/-/binding-linux-s390x-gnu-1.0.3.tgz",
-+      "integrity": "sha512-Iq4ko0r4XsgbrF/LunNgHtAGLRRVE2kXonAXQ/MV0mC6jQpMOhW1SvtZja2EhC/kd05++bP78dsqBeIQyYJ6Yg==",
-+      "cpu": [
-+        "s390x"
-+      ],
-+      "dev": true,
-+      "libc": [
-+        "glibc"
-+      ],
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "linux"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-linux-x64-gnu": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-x64-gnu/-/binding-linux-x64-gnu-1.0.3.tgz",
-+      "integrity": "sha512-B8m6tD5+/N5FeNQFbKlLA/2yVq9ycQP1SeedyEYYKWBNR3ZQbkvIUcNnDNM03lO1l5F2roiiFJGgvoLLyZXtSg==",
-+      "cpu": [
-+        "x64"
-+      ],
-+      "dev": true,
-+      "libc": [
-+        "glibc"
-+      ],
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "linux"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-linux-x64-musl": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-x64-musl/-/binding-linux-x64-musl-1.0.3.tgz",
-+      "integrity": "sha512-pSdpdUJHkuCxun9LE7jvgUB9qsRgaiyNNCX7m/AvHTcq67AiT/Yhoxvw5zPfhrM8k/BfP8ce/hMOpthKDpEUow==",
-+      "cpu": [
-+        "x64"
-+      ],
-+      "dev": true,
-+      "libc": [
-+        "musl"
-+      ],
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "linux"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-openharmony-arm64": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-openharmony-arm64/-/binding-openharmony-arm64-1.0.3.tgz",
-+      "integrity": "sha512-OXXS3RKJgX2uLwM+gYyuH5omcH8fL1LJs96pZGgtetVCahON57+d4SJHzTgZiOjxgGkSnpXpOsWuPDGAKAigEg==",
-+      "cpu": [
-+        "arm64"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "openharmony"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-wasm32-wasi": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-wasm32-wasi/-/binding-wasm32-wasi-1.0.3.tgz",
-+      "integrity": "sha512-JTtb8BWFynicNSoPrehsCzBtOKjZ6jhMiPFEmOiuXg1Fl8dn2KHQob+GuPSGR0dryQa1PQJbzjF3dqO/whhjLg==",
-+      "cpu": [
-+        "wasm32"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "dependencies": {
-+        "@emnapi/core": "1.10.0",
-+        "@emnapi/runtime": "1.10.0",
-+        "@napi-rs/wasm-runtime": "^1.1.4"
-+      },
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-wasm32-wasi/node_modules/@emnapi/runtime": {
-+      "version": "1.10.0",
-+      "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.10.0.tgz",
-+      "integrity": "sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==",
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "dependencies": {
-+        "tslib": "^2.4.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-win32-arm64-msvc": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-win32-arm64-msvc/-/binding-win32-arm64-msvc-1.0.3.tgz",
-+      "integrity": "sha512-gEdFFEN70A/jxb2svrWsN3aDL7OUtmvlOy+6fa2jxG8K0wQ1ZbdeLGnidov6Yu5/733dI5ySfzFlQ/cb0bSz1g==",
-+      "cpu": [
-+        "arm64"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "win32"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/binding-win32-x64-msvc": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/@rolldown/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.0.3.tgz",
-+      "integrity": "sha512-eXB7CHuaQdqmJcc3koCNtNPmT/bj2gc999kUFgBxG8Ac0NdgXc4rkCHhqrgrhN3zddvvvrgzj1e90SuSfmyIXA==",
-+      "cpu": [
-+        "x64"
-+      ],
-+      "dev": true,
-+      "license": "MIT",
-+      "optional": true,
-+      "os": [
-+        "win32"
-+      ],
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      }
-+    },
-+    "node_modules/@rolldown/pluginutils": {
-+      "version": "1.0.1",
-+      "resolved": "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.1.tgz",
-+      "integrity": "sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==",
-+      "dev": true,
-+      "license": "MIT"
-+    },
-     "node_modules/@rtsao/scc": {
-       "version": "1.1.0",
-       "resolved": "https://registry.npmjs.org/@rtsao/scc/-/scc-1.1.0.tgz",
-@@ -2786,6 +3115,12 @@
-       "devOptional": true,
-       "license": "MIT"
-     },
-+    "node_modules/@standard-schema/utils": {
-+      "version": "0.3.0",
-+      "resolved": "https://registry.npmjs.org/@standard-schema/utils/-/utils-0.3.0.tgz",
-+      "integrity": "sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==",
-+      "license": "MIT"
-+    },
-     "node_modules/@swc/helpers": {
-       "version": "0.5.15",
-       "resolved": "https://registry.npmjs.org/@swc/helpers/-/helpers-0.5.15.tgz",
-@@ -3164,6 +3499,24 @@
-         "tslib": "^2.4.0"
-       }
-     },
-+    "node_modules/@types/chai": {
-+      "version": "5.2.3",
-+      "resolved": "https://registry.npmjs.org/@types/chai/-/chai-5.2.3.tgz",
-+      "integrity": "sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@types/deep-eql": "*",
-+        "assertion-error": "^2.0.1"
-+      }
-+    },
-+    "node_modules/@types/deep-eql": {
-+      "version": "4.0.2",
-+      "resolved": "https://registry.npmjs.org/@types/deep-eql/-/deep-eql-4.0.2.tgz",
-+      "integrity": "sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==",
-+      "dev": true,
-+      "license": "MIT"
-+    },
-     "node_modules/@types/estree": {
-       "version": "1.0.9",
-       "resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz",
-@@ -3870,6 +4223,141 @@
-         "win32"
-       ]
-     },
-+    "node_modules/@vitest/expect": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/@vitest/expect/-/expect-4.1.9.tgz",
-+      "integrity": "sha512-vl/rYsUKcBr3SnQn166+XR5ZQcgMx3DQhFWdfli/cWpLnLUmbxZvyrJZotLFUryib+LtArYMSTJ5RbQ57ZqrlA==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@standard-schema/spec": "^1.1.0",
-+        "@types/chai": "^5.2.2",
-+        "@vitest/spy": "4.1.9",
-+        "@vitest/utils": "4.1.9",
-+        "chai": "^6.2.2",
-+        "tinyrainbow": "^3.1.0"
-+      },
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      }
-+    },
-+    "node_modules/@vitest/mocker": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/@vitest/mocker/-/mocker-4.1.9.tgz",
-+      "integrity": "sha512-EVkXzBjrPGM+cK8/ANWgBrkUCfJfb38/EfTSO8h7pWvKkyPkpWxvR7BkD2MyItMF62C97zAEoqdpUixwR/e+Rw==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@vitest/spy": "4.1.9",
-+        "estree-walker": "^3.0.3",
-+        "magic-string": "^0.30.21"
-+      },
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      },
-+      "peerDependencies": {
-+        "msw": "^2.4.9",
-+        "vite": "^6.0.0 || ^7.0.0 || ^8.0.0"
-+      },
-+      "peerDependenciesMeta": {
-+        "msw": {
-+          "optional": true
-+        },
-+        "vite": {
-+          "optional": true
-+        }
-+      }
-+    },
-+    "node_modules/@vitest/pretty-format": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/@vitest/pretty-format/-/pretty-format-4.1.9.tgz",
-+      "integrity": "sha512-s0iufns3iIFitdgm+YR7g1whCAaGtXz459VS9/PqyKDEEFgYIhsHOQmXgIgDuYCt7DeQmiZT0Qe2OA2p4ZPu5A==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "tinyrainbow": "^3.1.0"
-+      },
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      }
-+    },
-+    "node_modules/@vitest/runner": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/@vitest/runner/-/runner-4.1.9.tgz",
-+      "integrity": "sha512-KXLMDtc7oe70+3mJfGrPUWPesswH+3sTxAMAMl8DG7I8IUQT4XW718dY5ID3vPUcmlu27CcKfY4P3h3I29SLJg==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@vitest/utils": "4.1.9",
-+        "pathe": "^2.0.3"
-+      },
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      }
-+    },
-+    "node_modules/@vitest/snapshot": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/@vitest/snapshot/-/snapshot-4.1.9.tgz",
-+      "integrity": "sha512-Jc7RKGNBo8Z28WYIm0Niej4xdSPByRf6mU58VpHQkd6Zh05rlnA+twjbK5HyeIGHxrzsc3mJgS43uM0CZKzaIA==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@vitest/pretty-format": "4.1.9",
-+        "@vitest/utils": "4.1.9",
-+        "magic-string": "^0.30.21",
-+        "pathe": "^2.0.3"
-+      },
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      }
-+    },
-+    "node_modules/@vitest/spy": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/@vitest/spy/-/spy-4.1.9.tgz",
-+      "integrity": "sha512-fHpsS6mIi+PiEW+vcRVOMkX1oSaPKne3VOclSFICPcGOmfKgXPU5iAah+wcNcj2xPrCCmfq99IDGf+EojhhvhA==",
-+      "dev": true,
-+      "license": "MIT",
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      }
-+    },
-+    "node_modules/@vitest/ui": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/@vitest/ui/-/ui-4.1.9.tgz",
-+      "integrity": "sha512-U/cRvtqfEPj27FI1n9cyUvi4vXXdcLhjJiI+InYKdk8hP4VrS6RXOjGL7rfFaeBc37iRKANsR6eEzIoC7lmgBQ==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@vitest/utils": "4.1.9",
-+        "fflate": "^0.8.2",
-+        "flatted": "^3.4.2",
-+        "pathe": "^2.0.3",
-+        "sirv": "^3.0.2",
-+        "tinyglobby": "^0.2.15",
-+        "tinyrainbow": "^3.1.0"
-+      },
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      },
-+      "peerDependencies": {
-+        "vitest": "4.1.9"
-+      }
-+    },
-+    "node_modules/@vitest/utils": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/@vitest/utils/-/utils-4.1.9.tgz",
-+      "integrity": "sha512-A51o8ymO5PpqlWNnBP9ZHPXDIpuMtTLlGSjN7la4US+LJzoUMyhwjA5QXlm39JexgwHKW4Xjs8Z2d3dLCXOeuA==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@vitest/pretty-format": "4.1.9",
-+        "convert-source-map": "^2.0.0",
-+        "tinyrainbow": "^3.1.0"
-+      },
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      }
-+    },
-     "node_modules/accepts": {
-       "version": "2.0.0",
-       "resolved": "https://registry.npmjs.org/accepts/-/accepts-2.0.0.tgz",
-@@ -4181,6 +4669,16 @@
-         "url": "https://github.com/sponsors/ljharb"
-       }
-     },
-+    "node_modules/assertion-error": {
-+      "version": "2.0.1",
-+      "resolved": "https://registry.npmjs.org/assertion-error/-/assertion-error-2.0.1.tgz",
-+      "integrity": "sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==",
-+      "dev": true,
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=12"
-+      }
-+    },
-     "node_modules/ast-types": {
-       "version": "0.16.1",
-       "resolved": "https://registry.npmjs.org/ast-types/-/ast-types-0.16.1.tgz",
-@@ -4514,6 +5012,16 @@
-       ],
-       "license": "CC-BY-4.0"
-     },
-+    "node_modules/chai": {
-+      "version": "6.2.2",
-+      "resolved": "https://registry.npmjs.org/chai/-/chai-6.2.2.tgz",
-+      "integrity": "sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==",
-+      "dev": true,
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=18"
-+      }
-+    },
-     "node_modules/chalk": {
-       "version": "4.1.2",
-       "resolved": "https://registry.npmjs.org/chalk/-/chalk-4.1.2.tgz",
-@@ -5418,6 +5926,13 @@
-         "node": ">= 0.4"
-       }
-     },
-+    "node_modules/es-module-lexer": {
-+      "version": "2.1.0",
-+      "resolved": "https://registry.npmjs.org/es-module-lexer/-/es-module-lexer-2.1.0.tgz",
-+      "integrity": "sha512-n27zTYMjYu1aj4MjCWzSP7G9r75utsaoc8m61weK+W8JMBGGQybd43GstCXZ3WNmSFtGT9wi59qQTW6mhTR5LQ==",
-+      "dev": true,
-+      "license": "MIT"
-+    },
-     "node_modules/es-object-atoms": {
-       "version": "1.1.2",
-       "resolved": "https://registry.npmjs.org/es-object-atoms/-/es-object-atoms-1.1.2.tgz",
-@@ -5958,6 +6473,16 @@
-         "node": ">=4.0"
-       }
-     },
-+    "node_modules/estree-walker": {
-+      "version": "3.0.3",
-+      "resolved": "https://registry.npmjs.org/estree-walker/-/estree-walker-3.0.3.tgz",
-+      "integrity": "sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@types/estree": "^1.0.0"
-+      }
-+    },
-     "node_modules/esutils": {
-       "version": "2.0.3",
-       "resolved": "https://registry.npmjs.org/esutils/-/esutils-2.0.3.tgz",
-@@ -6024,6 +6549,16 @@
-         "url": "https://github.com/sindresorhus/execa?sponsor=1"
-       }
-     },
-+    "node_modules/expect-type": {
-+      "version": "1.3.0",
-+      "resolved": "https://registry.npmjs.org/expect-type/-/expect-type-1.3.0.tgz",
-+      "integrity": "sha512-knvyeauYhqjOYvQ66MznSMs83wmHrCycNEN6Ao+2AeYEfxUIkuiVxdEa1qlGEPK+We3n0THiDciYSsCcgW/DoA==",
-+      "dev": true,
-+      "license": "Apache-2.0",
-+      "engines": {
-+        "node": ">=12.0.0"
-+      }
-+    },
-     "node_modules/express": {
-       "version": "5.2.1",
-       "resolved": "https://registry.npmjs.org/express/-/express-5.2.1.tgz",
-@@ -6213,6 +6748,13 @@
-         "node": "^12.20 || >= 14.13"
-       }
-     },
-+    "node_modules/fflate": {
-+      "version": "0.8.3",
-+      "resolved": "https://registry.npmjs.org/fflate/-/fflate-0.8.3.tgz",
-+      "integrity": "sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==",
-+      "dev": true,
-+      "license": "MIT"
-+    },
-     "node_modules/figures": {
-       "version": "6.1.0",
-       "resolved": "https://registry.npmjs.org/figures/-/figures-6.1.0.tgz",
-@@ -8263,6 +8805,16 @@
-         "url": "https://github.com/sponsors/ljharb"
-       }
-     },
-+    "node_modules/mrmime": {
-+      "version": "2.0.1",
-+      "resolved": "https://registry.npmjs.org/mrmime/-/mrmime-2.0.1.tgz",
-+      "integrity": "sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==",
-+      "dev": true,
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=10"
-+      }
-+    },
-     "node_modules/ms": {
-       "version": "2.1.3",
-       "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz",
-@@ -8406,6 +8958,16 @@
-         }
-       }
-     },
-+    "node_modules/next-themes": {
-+      "version": "0.4.6",
-+      "resolved": "https://registry.npmjs.org/next-themes/-/next-themes-0.4.6.tgz",
-+      "integrity": "sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==",
-+      "license": "MIT",
-+      "peerDependencies": {
-+        "react": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc",
-+        "react-dom": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc"
-+      }
-+    },
-     "node_modules/next/node_modules/postcss": {
-       "version": "8.4.31",
-       "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.4.31.tgz",
-@@ -8658,6 +9220,20 @@
-         "url": "https://github.com/sponsors/ljharb"
-       }
-     },
-+    "node_modules/obug": {
-+      "version": "2.1.3",
-+      "resolved": "https://registry.npmjs.org/obug/-/obug-2.1.3.tgz",
-+      "integrity": "sha512-9miFgM2OFba7hB+pRgvtV84pYTBaoTHohvmIgiRt6dRIzbwEOIaNaP+dIlGs2fNFoB0SeISs0Jz5WFVRid6Xyg==",
-+      "dev": true,
-+      "funding": [
-+        "https://github.com/sponsors/sxzz",
-+        "https://opencollective.com/debug"
-+      ],
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=12.20.0"
-+      }
-+    },
-     "node_modules/ohash": {
-       "version": "2.0.11",
-       "resolved": "https://registry.npmjs.org/ohash/-/ohash-2.0.11.tgz",
-@@ -9408,6 +9984,22 @@
-         "react": "^19.2.4"
-       }
-     },
-+    "node_modules/react-hook-form": {
-+      "version": "7.80.0",
-+      "resolved": "https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.80.0.tgz",
-+      "integrity": "sha512-4P+fk6oXsxY+6xSj7Euhc2sumQD8zQqCuVHoJwoyp9EchP+IUW9OESB7uHFJOKsIBQ4MQqYE84INJFqUCYNoOg==",
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=18.0.0"
-+      },
-+      "funding": {
-+        "type": "opencollective",
-+        "url": "https://opencollective.com/react-hook-form"
-+      },
-+      "peerDependencies": {
-+        "react": "^16.8.0 || ^17 || ^18 || ^19"
-+      }
-+    },
-     "node_modules/react-is": {
-       "version": "16.13.1",
-       "resolved": "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz",
-@@ -9608,6 +10200,40 @@
-         "node": ">=0.10.0"
-       }
-     },
-+    "node_modules/rolldown": {
-+      "version": "1.0.3",
-+      "resolved": "https://registry.npmjs.org/rolldown/-/rolldown-1.0.3.tgz",
-+      "integrity": "sha512-i00lAJ2ks1BYr7rjNjKC7BcqAS7nVfiT3QX1SI5aY+AFHblCmaUf9OE9dbdzDvW6dJxbi2ZCZiy9v3CcwOiX3g==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@oxc-project/types": "=0.133.0",
-+        "@rolldown/pluginutils": "^1.0.0"
-+      },
-+      "bin": {
-+        "rolldown": "bin/cli.mjs"
-+      },
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      },
-+      "optionalDependencies": {
-+        "@rolldown/binding-android-arm64": "1.0.3",
-+        "@rolldown/binding-darwin-arm64": "1.0.3",
-+        "@rolldown/binding-darwin-x64": "1.0.3",
-+        "@rolldown/binding-freebsd-x64": "1.0.3",
-+        "@rolldown/binding-linux-arm-gnueabihf": "1.0.3",
-+        "@rolldown/binding-linux-arm64-gnu": "1.0.3",
-+        "@rolldown/binding-linux-arm64-musl": "1.0.3",
-+        "@rolldown/binding-linux-ppc64-gnu": "1.0.3",
-+        "@rolldown/binding-linux-s390x-gnu": "1.0.3",
-+        "@rolldown/binding-linux-x64-gnu": "1.0.3",
-+        "@rolldown/binding-linux-x64-musl": "1.0.3",
-+        "@rolldown/binding-openharmony-arm64": "1.0.3",
-+        "@rolldown/binding-wasm32-wasi": "1.0.3",
-+        "@rolldown/binding-win32-arm64-msvc": "1.0.3",
-+        "@rolldown/binding-win32-x64-msvc": "1.0.3"
-+      }
-+    },
-     "node_modules/router": {
-       "version": "2.2.0",
-       "resolved": "https://registry.npmjs.org/router/-/router-2.2.0.tgz",
-@@ -10087,6 +10713,13 @@
-         "url": "https://github.com/sponsors/ljharb"
-       }
-     },
-+    "node_modules/siginfo": {
-+      "version": "2.0.0",
-+      "resolved": "https://registry.npmjs.org/siginfo/-/siginfo-2.0.0.tgz",
-+      "integrity": "sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==",
-+      "dev": true,
-+      "license": "ISC"
-+    },
-     "node_modules/signal-exit": {
-       "version": "4.1.0",
-       "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-4.1.0.tgz",
-@@ -10099,12 +10732,37 @@
-         "url": "https://github.com/sponsors/isaacs"
-       }
-     },
-+    "node_modules/sirv": {
-+      "version": "3.0.2",
-+      "resolved": "https://registry.npmjs.org/sirv/-/sirv-3.0.2.tgz",
-+      "integrity": "sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@polka/url": "^1.0.0-next.24",
-+        "mrmime": "^2.0.0",
-+        "totalist": "^3.0.0"
-+      },
-+      "engines": {
-+        "node": ">=18"
-+      }
-+    },
-     "node_modules/sisteransi": {
-       "version": "1.0.5",
-       "resolved": "https://registry.npmjs.org/sisteransi/-/sisteransi-1.0.5.tgz",
-       "integrity": "sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==",
-       "license": "MIT"
-     },
-+    "node_modules/sonner": {
-+      "version": "2.0.7",
-+      "resolved": "https://registry.npmjs.org/sonner/-/sonner-2.0.7.tgz",
-+      "integrity": "sha512-W6ZN4p58k8aDKA4XPcx2hpIQXBRAgyiWVkYhT7CvK6D3iAu7xjvVyhQHg2/iaKJZ1XVJ4r7XuwGL+WGEK37i9w==",
-+      "license": "MIT",
-+      "peerDependencies": {
-+        "react": "^18.0.0 || ^19.0.0 || ^19.0.0-rc",
-+        "react-dom": "^18.0.0 || ^19.0.0 || ^19.0.0-rc"
-+      }
-+    },
-     "node_modules/source-map": {
-       "version": "0.6.1",
-       "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
-@@ -10140,6 +10798,13 @@
-       "dev": true,
-       "license": "MIT"
-     },
-+    "node_modules/stackback": {
-+      "version": "0.0.2",
-+      "resolved": "https://registry.npmjs.org/stackback/-/stackback-0.0.2.tgz",
-+      "integrity": "sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==",
-+      "dev": true,
-+      "license": "MIT"
-+    },
-     "node_modules/statuses": {
-       "version": "2.0.2",
-       "resolved": "https://registry.npmjs.org/statuses/-/statuses-2.0.2.tgz",
-@@ -10533,6 +11198,23 @@
-       "integrity": "sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==",
-       "license": "MIT"
-     },
-+    "node_modules/tinybench": {
-+      "version": "2.9.0",
-+      "resolved": "https://registry.npmjs.org/tinybench/-/tinybench-2.9.0.tgz",
-+      "integrity": "sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==",
-+      "dev": true,
-+      "license": "MIT"
-+    },
-+    "node_modules/tinyexec": {
-+      "version": "1.2.4",
-+      "resolved": "https://registry.npmjs.org/tinyexec/-/tinyexec-1.2.4.tgz",
-+      "integrity": "sha512-SHf/r48b7vOrjve9PxJo3MN5v5yuyjHvdUcrQffT3WXMUfnGmHDVbC4k3sHJaJTgZCwpUplIaAo5ANtMyp3YHg==",
-+      "dev": true,
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=18"
-+      }
-+    },
-     "node_modules/tinyglobby": {
-       "version": "0.2.17",
-       "resolved": "https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.17.tgz",
-@@ -10581,6 +11263,16 @@
-         "url": "https://github.com/sponsors/jonschlinkert"
-       }
-     },
-+    "node_modules/tinyrainbow": {
-+      "version": "3.1.0",
-+      "resolved": "https://registry.npmjs.org/tinyrainbow/-/tinyrainbow-3.1.0.tgz",
-+      "integrity": "sha512-Bf+ILmBgretUrdJxzXM0SgXLZ3XfiaUuOj/IKQHuTXip+05Xn+uyEYdVg0kYDipTBcLrCVyUzAPz7QmArb0mmw==",
-+      "dev": true,
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=14.0.0"
-+      }
-+    },
-     "node_modules/to-regex-range": {
-       "version": "5.0.1",
-       "resolved": "https://registry.npmjs.org/to-regex-range/-/to-regex-range-5.0.1.tgz",
-@@ -10602,6 +11294,16 @@
-         "node": ">=0.6"
-       }
-     },
-+    "node_modules/totalist": {
-+      "version": "3.0.1",
-+      "resolved": "https://registry.npmjs.org/totalist/-/totalist-3.0.1.tgz",
-+      "integrity": "sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==",
-+      "dev": true,
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=6"
-+      }
-+    },
-     "node_modules/ts-api-utils": {
-       "version": "2.5.0",
-       "resolved": "https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.5.0.tgz",
-@@ -11036,6 +11738,207 @@
-         "node": ">= 0.8"
-       }
-     },
-+    "node_modules/vite": {
-+      "version": "8.0.16",
-+      "resolved": "https://registry.npmjs.org/vite/-/vite-8.0.16.tgz",
-+      "integrity": "sha512-h9bXPmJichP5fLmVQo3PyaGSDE2n3aPuomeAlVRm0JLmt4rY6zmPKd59HYI4LNW8oTK7tlTsuC7l/m7awx9Jcw==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "lightningcss": "^1.32.0",
-+        "picomatch": "^4.0.4",
-+        "postcss": "^8.5.15",
-+        "rolldown": "1.0.3",
-+        "tinyglobby": "^0.2.17"
-+      },
-+      "bin": {
-+        "vite": "bin/vite.js"
-+      },
-+      "engines": {
-+        "node": "^20.19.0 || >=22.12.0"
-+      },
-+      "funding": {
-+        "url": "https://github.com/vitejs/vite?sponsor=1"
-+      },
-+      "optionalDependencies": {
-+        "fsevents": "~2.3.3"
-+      },
-+      "peerDependencies": {
-+        "@types/node": "^20.19.0 || >=22.12.0",
-+        "@vitejs/devtools": "^0.1.18",
-+        "esbuild": "^0.27.0 || ^0.28.0",
-+        "jiti": ">=1.21.0",
-+        "less": "^4.0.0",
-+        "sass": "^1.70.0",
-+        "sass-embedded": "^1.70.0",
-+        "stylus": ">=0.54.8",
-+        "sugarss": "^5.0.0",
-+        "terser": "^5.16.0",
-+        "tsx": "^4.8.1",
-+        "yaml": "^2.4.2"
-+      },
-+      "peerDependenciesMeta": {
-+        "@types/node": {
-+          "optional": true
-+        },
-+        "@vitejs/devtools": {
-+          "optional": true
-+        },
-+        "esbuild": {
-+          "optional": true
-+        },
-+        "jiti": {
-+          "optional": true
-+        },
-+        "less": {
-+          "optional": true
-+        },
-+        "sass": {
-+          "optional": true
-+        },
-+        "sass-embedded": {
-+          "optional": true
-+        },
-+        "stylus": {
-+          "optional": true
-+        },
-+        "sugarss": {
-+          "optional": true
-+        },
-+        "terser": {
-+          "optional": true
-+        },
-+        "tsx": {
-+          "optional": true
-+        },
-+        "yaml": {
-+          "optional": true
-+        }
-+      }
-+    },
-+    "node_modules/vite/node_modules/picomatch": {
-+      "version": "4.0.4",
-+      "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-4.0.4.tgz",
-+      "integrity": "sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==",
-+      "dev": true,
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=12"
-+      },
-+      "funding": {
-+        "url": "https://github.com/sponsors/jonschlinkert"
-+      }
-+    },
-+    "node_modules/vitest": {
-+      "version": "4.1.9",
-+      "resolved": "https://registry.npmjs.org/vitest/-/vitest-4.1.9.tgz",
-+      "integrity": "sha512-nE3/LEyc0z87uHYLZebqCUOaJr2hdtuPp7BQ4BosVFnfltxgAvMG08NyrSGlPpOUWvR27c5flSmYFTNr78L9GQ==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "@vitest/expect": "4.1.9",
-+        "@vitest/mocker": "4.1.9",
-+        "@vitest/pretty-format": "4.1.9",
-+        "@vitest/runner": "4.1.9",
-+        "@vitest/snapshot": "4.1.9",
-+        "@vitest/spy": "4.1.9",
-+        "@vitest/utils": "4.1.9",
-+        "es-module-lexer": "^2.0.0",
-+        "expect-type": "^1.3.0",
-+        "magic-string": "^0.30.21",
-+        "obug": "^2.1.1",
-+        "pathe": "^2.0.3",
-+        "picomatch": "^4.0.3",
-+        "std-env": "^4.0.0-rc.1",
-+        "tinybench": "^2.9.0",
-+        "tinyexec": "^1.0.2",
-+        "tinyglobby": "^0.2.15",
-+        "tinyrainbow": "^3.1.0",
-+        "vite": "^6.0.0 || ^7.0.0 || ^8.0.0",
-+        "why-is-node-running": "^2.3.0"
-+      },
-+      "bin": {
-+        "vitest": "vitest.mjs"
-+      },
-+      "engines": {
-+        "node": "^20.0.0 || ^22.0.0 || >=24.0.0"
-+      },
-+      "funding": {
-+        "url": "https://opencollective.com/vitest"
-+      },
-+      "peerDependencies": {
-+        "@edge-runtime/vm": "*",
-+        "@opentelemetry/api": "^1.9.0",
-+        "@types/node": "^20.0.0 || ^22.0.0 || >=24.0.0",
-+        "@vitest/browser-playwright": "4.1.9",
-+        "@vitest/browser-preview": "4.1.9",
-+        "@vitest/browser-webdriverio": "4.1.9",
-+        "@vitest/coverage-istanbul": "4.1.9",
-+        "@vitest/coverage-v8": "4.1.9",
-+        "@vitest/ui": "4.1.9",
-+        "happy-dom": "*",
-+        "jsdom": "*",
-+        "vite": "^6.0.0 || ^7.0.0 || ^8.0.0"
-+      },
-+      "peerDependenciesMeta": {
-+        "@edge-runtime/vm": {
-+          "optional": true
-+        },
-+        "@opentelemetry/api": {
-+          "optional": true
-+        },
-+        "@types/node": {
-+          "optional": true
-+        },
-+        "@vitest/browser-playwright": {
-+          "optional": true
-+        },
-+        "@vitest/browser-preview": {
-+          "optional": true
-+        },
-+        "@vitest/browser-webdriverio": {
-+          "optional": true
-+        },
-+        "@vitest/coverage-istanbul": {
-+          "optional": true
-+        },
-+        "@vitest/coverage-v8": {
-+          "optional": true
-+        },
-+        "@vitest/ui": {
-+          "optional": true
-+        },
-+        "happy-dom": {
-+          "optional": true
-+        },
-+        "jsdom": {
-+          "optional": true
-+        },
-+        "vite": {
-+          "optional": false
-+        }
-+      }
-+    },
-+    "node_modules/vitest/node_modules/picomatch": {
-+      "version": "4.0.4",
-+      "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-4.0.4.tgz",
-+      "integrity": "sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==",
-+      "dev": true,
-+      "license": "MIT",
-+      "engines": {
-+        "node": ">=12"
-+      },
-+      "funding": {
-+        "url": "https://github.com/sponsors/jonschlinkert"
-+      }
-+    },
-+    "node_modules/vitest/node_modules/std-env": {
-+      "version": "4.1.0",
-+      "resolved": "https://registry.npmjs.org/std-env/-/std-env-4.1.0.tgz",
-+      "integrity": "sha512-Rq7ybcX2RuC55r9oaPVEW7/xu3tj8u4GeBYHBWCychFtzMIr86A7e3PPEBPT37sHStKX3+TiX/Fr/ACmJLVlLQ==",
-+      "dev": true,
-+      "license": "MIT"
-+    },
-     "node_modules/web-streams-polyfill": {
-       "version": "3.3.3",
-       "resolved": "https://registry.npmjs.org/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz",
-@@ -11149,6 +12052,23 @@
-         "url": "https://github.com/sponsors/ljharb"
-       }
-     },
-+    "node_modules/why-is-node-running": {
-+      "version": "2.3.0",
-+      "resolved": "https://registry.npmjs.org/why-is-node-running/-/why-is-node-running-2.3.0.tgz",
-+      "integrity": "sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==",
-+      "dev": true,
-+      "license": "MIT",
-+      "dependencies": {
-+        "siginfo": "^2.0.0",
-+        "stackback": "0.0.2"
-+      },
-+      "bin": {
-+        "why-is-node-running": "cli.js"
-+      },
-+      "engines": {
-+        "node": ">=8"
-+      }
-+    },
-     "node_modules/word-wrap": {
-       "version": "1.2.5",
-       "resolved": "https://registry.npmjs.org/word-wrap/-/word-wrap-1.2.5.tgz",
-diff --git a/package.json b/package.json
-index a88fc8e..62715bb 100644
---- a/package.json
-+++ b/package.json
-@@ -13,27 +13,34 @@
-   },
-   "dependencies": {
-     "@base-ui/react": "^1.6.0",
-+    "@hookform/resolvers": "^5.4.0",
-     "@prisma/client": "^7.8.0",
-     "class-variance-authority": "^0.7.1",
-     "clsx": "^2.1.1",
-     "lucide-react": "^1.21.0",
-     "next": "16.2.9",
-+    "next-themes": "^0.4.6",
-     "react": "19.2.4",
-     "react-dom": "19.2.4",
-+    "react-hook-form": "^7.80.0",
-     "shadcn": "^4.11.0",
-+    "sonner": "^2.0.7",
-     "tailwind-merge": "^3.6.0",
--    "tw-animate-css": "^1.4.0"
-+    "tw-animate-css": "^1.4.0",
-+    "zod": "^4.4.3"
-   },
-   "devDependencies": {
-     "@tailwindcss/postcss": "^4",
-     "@types/node": "^20",
-     "@types/react": "^19",
-     "@types/react-dom": "^19",
-+    "@vitest/ui": "^4.1.9",
-     "eslint": "^9",
-     "eslint-config-next": "16.2.9",
-     "prisma": "^7.8.0",
-     "tailwindcss": "^4",
-     "tsx": "^4.22.4",
--    "typescript": "^5"
-+    "typescript": "^5",
-+    "vitest": "^4.1.9"
-   }
- }
-diff --git a/prisma/schema.prisma b/prisma/schema.prisma
-index f8a7e35..21dd947 100644
---- a/prisma/schema.prisma
-+++ b/prisma/schema.prisma
-@@ -1,5 +1,6 @@
- generator client {
-   provider = "prisma-client-js"
-+  engineType = "library"
- }
- 
- datasource db {
-diff --git a/src/app/actions.test.ts b/src/app/actions.test.ts
+diff --git a/src/app/admin/(guarded)/layout.tsx b/src/app/admin/(guarded)/layout.tsx
 new file mode 100644
-index 0000000..8f500ff
+index 0000000..8b94e9b
 --- /dev/null
-+++ b/src/app/actions.test.ts
-@@ -0,0 +1,58 @@
-+import { describe, it, expect, vi, beforeEach } from "vitest";
-+import { registerAction } from "./actions";
++++ b/src/app/admin/(guarded)/layout.tsx
+@@ -0,0 +1,37 @@
++import { cookies } from "next/headers";
++import { redirect } from "next/navigation";
++import Link from "next/link";
++import { logoutAction } from "../actions";
 +
-+// Mock prisma for testing
-+vi.mock("@/lib/prisma", () => {
-+  return {
-+    default: {
-+      competition: {
-+        findUnique: vi.fn(),
-+      },
-+      participant: {
-+        findUnique: vi.fn(),
-+        upsert: vi.fn(),
-+      },
-+      registration: {
-+        findUnique: vi.fn(),
-+        create: vi.fn(),
-+      },
-+      $transaction: vi.fn((cb) => cb()), // mock transaction
-+    },
-+  };
-+});
++export default async function AdminGuardedLayout({
++  children,
++}: {
++  children: React.ReactNode;
++}) {
++  const authCookie = (await cookies()).get("admin_auth");
++  if (authCookie?.value !== "true") {
++    redirect("/admin/login");
++  }
 +
-+describe("registerAction", () => {
-+  beforeEach(() => {
-+    vi.clearAllMocks();
-+  });
-+
-+  it("should fail if competition does not exist", async () => {
-+    // Arrange
-+    const formData = new FormData();
-+    formData.append("competitionId", "non-existent");
-+    formData.append("name", "Budi");
-+    formData.append("houseBlock", "C3");
-+    formData.append("houseNumber", "12A");
-+    formData.append("phone", "08123456789");
-+
-+    // Mock prisma.competition.findUnique to return null
-+    const prisma = (await import("@/lib/prisma")).default;
-+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-+    (prisma.competition.findUnique as any).mockResolvedValue(null);
-+
-+    // Act
-+    const result = await registerAction(null, formData);
-+
-+    // Assert
-+    expect(result.error).toBe(true);
-+    expect(result.message).toBe("Lomba tidak ditemukan.");
-+  });
-+
-+  it.todo("should fail if registration is closed");
-+  
-+  it.todo("should fail if quota is full");
-+
-+  it.todo("should fail if participant already registered for the same competition");
-+
-+  it.todo("should succeed if valid");
-+});
-diff --git a/src/app/actions.ts b/src/app/actions.ts
++  return (
++    <div className="min-h-screen flex flex-col bg-putih-kertas text-arang">
++      <header className="bg-merah text-putih-kertas p-4 shadow-md flex justify-between items-center">
++        <div className="font-bold text-xl flex items-center gap-2">
++          <Link href="/admin" className="hover:text-emas transition-colors">GSB Admin Panel</Link>
++        </div>
++        <nav className="flex gap-6 items-center font-medium">
++          <Link href="/admin" className="hover:text-emas transition-colors">Dashboard</Link>
++          <Link href="/admin/peserta" className="hover:text-emas transition-colors">Peserta</Link>
++          <form action={logoutAction}>
++            <button className="bg-merah-tua hover:bg-black/20 text-putih-kertas px-4 py-2 rounded-md transition-colors text-sm font-semibold">
++              Logout
++            </button>
++          </form>
++        </nav>
++      </header>
++      <main className="flex-1 p-6 lg:p-8 max-w-7xl mx-auto w-full">
++        {children}
++      </main>
++    </div>
++  );
++}
+diff --git a/src/app/admin/(guarded)/lomba/[slug]/actions.ts b/src/app/admin/(guarded)/lomba/[slug]/actions.ts
 new file mode 100644
-index 0000000..f145bce
+index 0000000..4780dd0
 --- /dev/null
-+++ b/src/app/actions.ts
-@@ -0,0 +1,100 @@
++++ b/src/app/admin/(guarded)/lomba/[slug]/actions.ts
+@@ -0,0 +1,22 @@
 +"use server";
 +
 +import prisma from "@/lib/prisma";
 +import { revalidatePath } from "next/cache";
-+import { registerSchema } from "@/lib/validations";
 +
-+export async function registerAction(prevState: unknown, formData: FormData) {
-+  try {
-+    const rawData = {
-+      competitionId: formData.get("competitionId") as string,
-+      name: formData.get("name") as string,
-+      houseBlock: formData.get("houseBlock") as string,
-+      houseNumber: formData.get("houseNumber") as string,
-+      phone: formData.get("phone") as string,
-+    };
-+
-+    const validatedData = registerSchema.safeParse(rawData);
-+
-+    if (!validatedData.success) {
-+      return {
-+        error: true,
-+        message: "Periksa kembali form anda.",
-+        fieldErrors: validatedData.error.flatten().fieldErrors,
-+      };
-+    }
-+
-+    const { competitionId, name, houseBlock, houseNumber, phone } = validatedData.data;
-+
-+    const competition = await prisma.competition.findUnique({
-+      where: { id: competitionId },
-+      include: {
-+        _count: {
-+          select: { registrations: true },
-+        },
-+      },
-+    });
-+
-+    if (!competition) {
-+      return { error: true, message: "Lomba tidak ditemukan." };
-+    }
-+
-+    if (!competition.registrationOpen || competition.status !== "REGISTRATION") {
-+      return { error: true, message: "Pendaftaran lomba ini sudah ditutup." };
-+    }
-+
-+    // Check capacity
-+    // NOTE: There is a known limitation here regarding race conditions.
-+    // In a high-concurrency scenario, multiple requests might pass this check simultaneously 
-+    // before the registrations are created, potentially exceeding the maxParticipants.
-+    // A more robust solution would involve a database transaction with a row lock on the competition.
-+    if (competition.maxParticipants && competition._count.registrations >= competition.maxParticipants) {
-+      return { error: true, message: "Kuota pendaftaran sudah penuh." };
-+    }
-+
-+    // Upsert participant by phone
-+    const participant = await prisma.participant.upsert({
-+      where: { phone },
-+      update: {
-+        name,
-+        houseBlock,
-+        houseNumber,
-+      },
-+      create: {
-+        phone,
-+        name,
-+        houseBlock,
-+        houseNumber,
-+      },
-+    });
-+
-+    // Check duplicate registration
-+    const existingRegistration = await prisma.registration.findUnique({
-+      where: {
-+        competitionId_participantId: {
-+          competitionId,
-+          participantId: participant.id,
-+        },
-+      },
-+    });
-+
-+    if (existingRegistration) {
-+      return { error: true, message: "Nomor HP ini sudah terdaftar di lomba ini." };
-+    }
-+
-+    await prisma.registration.create({
-+      data: {
-+        competitionId,
-+        participantId: participant.id,
-+      },
-+    });
-+
-+    revalidatePath("/lomba/[slug]", "page");
-+    revalidatePath("/lomba");
-+
-+    return { error: false, message: "Pendaftaran berhasil!" };
-+  } catch (error) {
-+    console.error("Registration error:", error);
-+    return { error: true, message: "Terjadi kesalahan saat mendaftar. Silakan coba lagi." };
-+  }
++export async function closeRegistrationAction(competitionId: string) {
++  await prisma.competition.update({
++    where: { id: competitionId },
++    data: { status: "LOCKED", registrationOpen: false },
++  });
++  revalidatePath("/admin");
++  revalidatePath(`/admin/lomba/[slug]`, "page");
 +}
-diff --git a/src/app/globals.css b/src/app/globals.css
-index c56032b..d5dc963 100644
---- a/src/app/globals.css
-+++ b/src/app/globals.css
-@@ -5,11 +5,22 @@
- @custom-variant dark (&:is(.dark *));
- 
- @theme inline {
-+  --color-merah: #CE1126;
-+  --color-merah-tua: #8E0C1B;
-+  --color-putih-kertas: #FAF6EE;
-+  --color-surface: #FFFFFF;
-+  --color-arang: #1C1A19;
-+  --color-emas: #C9962E;
 +
-+  --font-anton: var(--font-anton);
-+  --font-jakarta: var(--font-jakarta);
-+  --font-jetbrains: var(--font-jetbrains);
-+
-   --color-background: var(--background);
-   --color-foreground: var(--foreground);
--  --font-sans: var(--font-sans);
--  --font-mono: var(--font-geist-mono);
--  --font-heading: var(--font-sans);
-+  --font-sans: var(--font-jakarta);
-+  --font-mono: var(--font-jetbrains);
-+  --font-heading: var(--font-anton);
-   --color-sidebar-ring: var(--sidebar-ring);
-   --color-sidebar-border: var(--sidebar-border);
-   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-@@ -49,30 +60,30 @@
- }
- 
- :root {
--  --background: oklch(1 0 0);
--  --foreground: oklch(0.145 0 0);
--  --card: oklch(1 0 0);
--  --card-foreground: oklch(0.145 0 0);
--  --popover: oklch(1 0 0);
--  --popover-foreground: oklch(0.145 0 0);
--  --primary: oklch(0.205 0 0);
--  --primary-foreground: oklch(0.985 0 0);
--  --secondary: oklch(0.97 0 0);
--  --secondary-foreground: oklch(0.205 0 0);
--  --muted: oklch(0.97 0 0);
--  --muted-foreground: oklch(0.556 0 0);
--  --accent: oklch(0.97 0 0);
--  --accent-foreground: oklch(0.205 0 0);
--  --destructive: oklch(0.577 0.245 27.325);
--  --border: oklch(0.922 0 0);
--  --input: oklch(0.922 0 0);
--  --ring: oklch(0.708 0 0);
-+  --background: #FAF6EE;
-+  --foreground: #1C1A19;
-+  --card: #FFFFFF;
-+  --card-foreground: #1C1A19;
-+  --popover: #FFFFFF;
-+  --popover-foreground: #1C1A19;
-+  --primary: #CE1126;
-+  --primary-foreground: #FAF6EE;
-+  --secondary: #FAF6EE;
-+  --secondary-foreground: #1C1A19;
-+  --muted: #FAF6EE;
-+  --muted-foreground: #1C1A19;
-+  --accent: #FAF6EE;
-+  --accent-foreground: #1C1A19;
-+  --destructive: #8E0C1B;
-+  --border: #1C1A1914; /* arang 8% opacity */
-+  --input: #1C1A1933; /* arang 20% opacity */
-+  --ring: #CE1126;
-   --chart-1: oklch(0.87 0 0);
-   --chart-2: oklch(0.556 0 0);
-   --chart-3: oklch(0.439 0 0);
-   --chart-4: oklch(0.371 0 0);
-   --chart-5: oklch(0.269 0 0);
--  --radius: 0.625rem;
-+  --radius: 12px;
-   --sidebar: oklch(0.985 0 0);
-   --sidebar-foreground: oklch(0.145 0 0);
-   --sidebar-primary: oklch(0.205 0 0);
-@@ -83,48 +94,14 @@
-   --sidebar-ring: oklch(0.708 0 0);
- }
- 
--.dark {
--  --background: oklch(0.145 0 0);
--  --foreground: oklch(0.985 0 0);
--  --card: oklch(0.205 0 0);
--  --card-foreground: oklch(0.985 0 0);
--  --popover: oklch(0.205 0 0);
--  --popover-foreground: oklch(0.985 0 0);
--  --primary: oklch(0.922 0 0);
--  --primary-foreground: oklch(0.205 0 0);
--  --secondary: oklch(0.269 0 0);
--  --secondary-foreground: oklch(0.985 0 0);
--  --muted: oklch(0.269 0 0);
--  --muted-foreground: oklch(0.708 0 0);
--  --accent: oklch(0.269 0 0);
--  --accent-foreground: oklch(0.985 0 0);
--  --destructive: oklch(0.704 0.191 22.216);
--  --border: oklch(1 0 0 / 10%);
--  --input: oklch(1 0 0 / 15%);
--  --ring: oklch(0.556 0 0);
--  --chart-1: oklch(0.87 0 0);
--  --chart-2: oklch(0.556 0 0);
--  --chart-3: oklch(0.439 0 0);
--  --chart-4: oklch(0.371 0 0);
--  --chart-5: oklch(0.269 0 0);
--  --sidebar: oklch(0.205 0 0);
--  --sidebar-foreground: oklch(0.985 0 0);
--  --sidebar-primary: oklch(0.488 0.243 264.376);
--  --sidebar-primary-foreground: oklch(0.985 0 0);
--  --sidebar-accent: oklch(0.269 0 0);
--  --sidebar-accent-foreground: oklch(0.985 0 0);
--  --sidebar-border: oklch(1 0 0 / 10%);
--  --sidebar-ring: oklch(0.556 0 0);
--}
--
- @layer base {
-   * {
-     @apply border-border outline-ring/50;
-   }
-   body {
--    @apply bg-background text-foreground;
-+    @apply bg-putih-kertas text-arang;
-   }
-   html {
--    @apply font-sans;
-+    @apply font-jakarta;
-   }
- }
-\ No newline at end of file
-diff --git a/src/app/layout.tsx b/src/app/layout.tsx
-index 662b472..6b5beb8 100644
---- a/src/app/layout.tsx
-+++ b/src/app/layout.tsx
-@@ -1,20 +1,27 @@
- import type { Metadata } from "next";
--import { Geist, Geist_Mono } from "next/font/google";
-+import { Anton, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
-+import { Toaster } from "@/components/ui/sonner";
- import "./globals.css";
- 
--const geistSans = Geist({
--  variable: "--font-geist-sans",
-+const anton = Anton({
-+  variable: "--font-anton",
-+  weight: "400",
-   subsets: ["latin"],
- });
- 
--const geistMono = Geist_Mono({
--  variable: "--font-geist-mono",
-+const plusJakartaSans = Plus_Jakarta_Sans({
-+  variable: "--font-jakarta",
-+  subsets: ["latin"],
-+});
-+
-+const jetbrainsMono = JetBrains_Mono({
-+  variable: "--font-jetbrains",
-   subsets: ["latin"],
- });
- 
- export const metadata: Metadata = {
--  title: "GSB Lomba 17-an",
--  description: "Web application for Green Serpong Bintaro Independence Day competitions",
-+  title: "LOMBA 17-AN | Green Serpong Bintaro",
-+  description: "Pendaftaran lomba 17-an Green Serpong Bintaro",
- };
- 
- export default function RootLayout({
-@@ -24,10 +31,13 @@ export default function RootLayout({
- }>) {
-   return (
-     <html
--      lang="en"
--      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-+      lang="id"
-+      className={`${anton.variable} ${plusJakartaSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
-     >
--      <body className="min-h-full flex flex-col">{children}</body>
-+      <body className="min-h-full flex flex-col bg-putih-kertas font-jakarta text-arang">
-+        {children}
-+        <Toaster />
-+      </body>
-     </html>
-   );
- }
-diff --git a/src/app/lomba/[slug]/page.tsx b/src/app/lomba/[slug]/page.tsx
++export async function openRegistrationAction(competitionId: string) {
++  await prisma.competition.update({
++    where: { id: competitionId },
++    data: { status: "REGISTRATION", registrationOpen: true },
++  });
++  revalidatePath("/admin");
++  revalidatePath(`/admin/lomba/[slug]`, "page");
++}
+diff --git a/src/app/admin/(guarded)/lomba/[slug]/page.tsx b/src/app/admin/(guarded)/lomba/[slug]/page.tsx
 new file mode 100644
-index 0000000..be639e3
+index 0000000..c85755a
 --- /dev/null
-+++ b/src/app/lomba/[slug]/page.tsx
-@@ -0,0 +1,124 @@
++++ b/src/app/admin/(guarded)/lomba/[slug]/page.tsx
+@@ -0,0 +1,90 @@
 +import prisma from "@/lib/prisma";
-+import Link from "next/link";
 +import { notFound } from "next/navigation";
-+import { RegistrationForm } from "@/components/registration-form";
-+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
++import { 
++  Table, 
++  TableBody, 
++  TableCell, 
++  TableHead, 
++  TableHeader, 
++  TableRow 
++} from "@/components/ui/table";
++import { Badge } from "@/components/ui/badge";
++import { Button } from "@/components/ui/button";
++import { closeRegistrationAction, openRegistrationAction } from "./actions";
 +
-+export default async function LombaDetail({
++export default async function CompetitionManagePage({
 +  params,
 +}: {
 +  params: Promise<{ slug: string }>;
 +}) {
-+  const { slug } = await params;
-+
-+  const competition = await prisma.competition.findUnique({
-+    where: { slug },
++  const resolvedParams = await params;
++  const comp = await prisma.competition.findUnique({
++    where: { slug: resolvedParams.slug },
 +    include: {
-+      _count: {
-+        select: { registrations: true },
-+      },
 +      registrations: {
-+        include: {
-+          participant: true,
-+        },
-+        orderBy: {
-+          createdAt: "asc",
-+        },
-+      },
-+    },
++        include: { participant: true },
++        orderBy: { createdAt: 'asc' }
++      }
++    }
 +  });
 +
-+  if (!competition) {
-+    notFound();
-+  }
++  if (!comp) return notFound();
 +
-+  const isFull = competition.maxParticipants && competition._count.registrations >= competition.maxParticipants;
-+  const isOpen = competition.registrationOpen && competition.status === "REGISTRATION";
-+  const canRegister = isOpen && !isFull;
++  const isRegistration = comp.status === "REGISTRATION";
 +
 +  return (
-+    <main className="flex flex-col items-center w-full min-h-screen px-6 py-12">
-+      <div className="max-w-md w-full flex flex-col gap-8">
++    <div className="space-y-6">
++      <div className="flex justify-between items-center flex-wrap gap-4">
 +        <div>
-+          <Link href="/lomba" className="text-arang/60 text-sm font-medium hover:text-merah transition-colors">
-+            &larr; Kembali ke Daftar
-+          </Link>
-+          <h1 className="font-anton text-4xl text-merah mt-4 tracking-wide">{competition.name}</h1>
-+          <div className="flex items-center gap-2 mt-3">
-+            <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
-+              {competition.teamSize === 1 ? "Perorangan" : `${competition.teamSize} Orang/Tim`}
-+            </span>
-+            {competition.maxParticipants && (
-+              <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
-+                {competition._count.registrations} / {competition.maxParticipants} Kuota
-+              </span>
-+            )}
-+          </div>
++          <h1 className="text-3xl font-bold tracking-tight text-arang">{comp.name}</h1>
++          <p className="text-gray-500 mt-2 flex items-center gap-2">
++            Status: <Badge variant={isRegistration ? "default" : "secondary"}>{comp.status}</Badge>
++          </p>
 +        </div>
-+
-+        {competition.description && (
-+          <Card className="border-border">
-+            <CardHeader className="pb-2">
-+              <CardTitle className="font-anton text-xl text-arang tracking-wide">Deskripsi</CardTitle>
-+            </CardHeader>
-+            <CardContent>
-+              <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.description}</p>
-+            </CardContent>
-+          </Card>
-+        )}
-+
-+        {competition.rules && (
-+          <Card className="border-border">
-+            <CardHeader className="pb-2">
-+              <CardTitle className="font-anton text-xl text-arang tracking-wide">Peraturan Lomba</CardTitle>
-+            </CardHeader>
-+            <CardContent>
-+              <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.rules}</p>
-+            </CardContent>
-+          </Card>
-+        )}
-+
-+        <Card className="border-border">
-+          <CardHeader className="pb-2">
-+            <CardTitle className="font-anton text-2xl text-arang tracking-wide">Pendaftaran</CardTitle>
-+          </CardHeader>
-+          <CardContent>
-+            {!canRegister ? (
-+              <div className="p-4 bg-merah/10 text-merah-tua rounded-lg text-sm font-medium text-center border border-merah/20">
-+                {isFull ? "Maaf, kuota pendaftaran sudah penuh." : "Pendaftaran untuk lomba ini sudah ditutup."}
-+              </div>
-+            ) : (
-+              <RegistrationForm competitionId={competition.id} />
-+            )}
-+          </CardContent>
-+        </Card>
-+
-+        <Card className="border-border">
-+          <CardHeader className="pb-2">
-+            <CardTitle className="font-anton text-xl text-arang tracking-wide">Daftar Peserta ({competition._count.registrations})</CardTitle>
-+          </CardHeader>
-+          <CardContent>
-+            {competition.registrations.length === 0 ? (
-+              <p className="text-sm text-arang/60 text-center py-4">Belum ada peserta yang mendaftar.</p>
-+            ) : (
-+              <ul className="flex flex-col gap-3">
-+                {competition.registrations.map((reg, idx) => (
-+                  <li key={reg.id} className="flex justify-between items-center pb-3 border-b border-arang/5 last:border-0 last:pb-0">
-+                    <div className="flex items-center gap-3">
-+                      <span className="font-jetbrains text-merah/60 font-bold text-sm w-4">{idx + 1}.</span>
-+                      <span className="font-medium text-arang">{reg.participant.name}</span>
-+                    </div>
-+                    <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
-+                      Blok {reg.participant.houseBlock}-{reg.participant.houseNumber}
-+                    </span>
-+                  </li>
-+                ))}
-+              </ul>
-+            )}
-+          </CardContent>
-+        </Card>
-+
-+      </div>
-+    </main>
-+  );
-+}
-diff --git a/src/app/lomba/page.tsx b/src/app/lomba/page.tsx
-new file mode 100644
-index 0000000..16529ed
---- /dev/null
-+++ b/src/app/lomba/page.tsx
-@@ -0,0 +1,73 @@
-+import prisma from "@/lib/prisma";
-+import Link from "next/link";
-+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-+
-+export default async function LombaList() {
-+  const competitions = await prisma.competition.findMany({
-+    where: { status: { not: "DRAFT" } },
-+    orderBy: { createdAt: "desc" },
-+    include: {
-+      _count: {
-+        select: { registrations: true },
-+      },
-+    },
-+  });
-+
-+  return (
-+    <main className="flex flex-col items-center w-full min-h-screen px-6 py-12">
-+      <div className="max-w-md w-full flex flex-col gap-8">
-+        <div>
-+          <Link href="/" className="text-arang/60 text-sm font-medium hover:text-merah transition-colors">
-+            &larr; Kembali
-+          </Link>
-+          <h1 className="font-anton text-4xl text-arang mt-4 tracking-wide">DAFTAR LOMBA</h1>
-+          <p className="text-arang/80 font-medium mt-1">Pilih lomba yang ingin Anda ikuti</p>
-+        </div>
-+
-+        <div className="flex flex-col gap-4">
-+          {competitions.map((comp) => {
-+            const isFull = comp.maxParticipants && comp._count.registrations >= comp.maxParticipants;
-+            const isOpen = comp.registrationOpen && comp.status === "REGISTRATION";
-+            const canRegister = isOpen && !isFull;
-+
-+            return (
-+              <Card key={comp.id} className="border-border">
-+                <CardHeader className="pb-2">
-+                  <CardTitle className="font-anton text-2xl text-merah tracking-wide">{comp.name}</CardTitle>
-+                  <div className="flex items-center gap-2 mt-2">
-+                    <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
-+                      {comp.teamSize === 1 ? "Perorangan" : `${comp.teamSize} Orang`}
-+                    </span>
-+                    <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
-+                      Kuota: {comp._count.registrations}/{comp.maxParticipants || '∞'}
-+                    </span>
-+                  </div>
-+                </CardHeader>
-+                <CardContent className="flex flex-col gap-4">
-+                  {comp.description && (
-+                    <p className="text-sm text-arang/80 line-clamp-2">{comp.description}</p>
-+                  )}
-+                  {canRegister ? (
-+                    <Link href={`/lomba/${comp.slug}`} className="w-full inline-block text-center bg-merah hover:bg-merah-tua text-putih-kertas py-3 rounded-[12px] font-bold transition-colors">
-+                      Daftar Sekarang
-+                    </Link>
-+                  ) : (
-+                    <button disabled className="w-full text-center bg-arang/10 text-arang/50 py-3 rounded-[12px] font-bold cursor-not-allowed">
-+                      {isFull ? "Kuota Penuh" : "Ditutup"}
-+                    </button>
-+                  )}
-+                </CardContent>
-+              </Card>
-+            );
-+          })}
-+
-+          {competitions.length === 0 && (
-+            <div className="text-center py-12 text-arang/60">
-+              Belum ada lomba yang tersedia.
-+            </div>
++        <div className="flex gap-4">
++          {isRegistration ? (
++            <form action={closeRegistrationAction.bind(null, comp.id)}>
++              <Button type="submit" variant="destructive">Tutup Pendaftaran (LOCKED)</Button>
++            </form>
++          ) : (
++            <form action={openRegistrationAction.bind(null, comp.id)}>
++              <Button type="submit" variant="outline">Buka Pendaftaran</Button>
++            </form>
 +          )}
 +        </div>
 +      </div>
-+    </main>
++
++      <div className="bg-white rounded-lg shadow border border-gray-200">
++        <div className="p-4 border-b border-gray-200">
++          <h2 className="text-xl font-semibold text-arang">Daftar Pendaftar ({comp.registrations.length})</h2>
++        </div>
++        <Table>
++          <TableHeader>
++            <TableRow>
++              <TableHead>Nama</TableHead>
++              <TableHead>No. HP</TableHead>
++              <TableHead>Blok/Rumah</TableHead>
++              <TableHead>Tanggal Daftar</TableHead>
++            </TableRow>
++          </TableHeader>
++          <TableBody>
++            {comp.registrations.length === 0 ? (
++              <TableRow>
++                <TableCell colSpan={4} className="text-center py-6 text-gray-500">Belum ada peserta yang mendaftar.</TableCell>
++              </TableRow>
++            ) : (
++              comp.registrations.map(reg => (
++                <TableRow key={reg.id}>
++                  <TableCell className="font-medium">{reg.participant.name}</TableCell>
++                  <TableCell>{reg.participant.phone}</TableCell>
++                  <TableCell>{reg.participant.houseBlock} - {reg.participant.houseNumber}</TableCell>
++                  <TableCell>{reg.createdAt.toLocaleDateString("id-ID")}</TableCell>
++                </TableRow>
++              ))
++            )}
++          </TableBody>
++        </Table>
++      </div>
++    </div>
 +  );
 +}
-diff --git a/src/app/page.tsx b/src/app/page.tsx
-index db1c981..bec8541 100644
---- a/src/app/page.tsx
-+++ b/src/app/page.tsx
-@@ -1,14 +1,62 @@
--export default function Home() {
-+import { BuntingStrip } from "@/components/bunting-strip";
-+import { Countdown } from "@/components/countdown";
-+import Link from "next/link";
+diff --git a/src/app/admin/(guarded)/page.tsx b/src/app/admin/(guarded)/page.tsx
+new file mode 100644
+index 0000000..89592bc
+--- /dev/null
++++ b/src/app/admin/(guarded)/page.tsx
+@@ -0,0 +1,71 @@
 +import prisma from "@/lib/prisma";
-+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
++import Link from "next/link";
++import {
++  Card,
++  CardContent,
++  CardDescription,
++  CardHeader,
++  CardTitle,
++} from "@/components/ui/card";
++import { Badge } from "@/components/ui/badge";
 +
-+export default async function Home() {
++export default async function AdminDashboardPage() {
 +  const competitions = await prisma.competition.findMany({
-+    where: { status: { not: "DRAFT" } },
-+    take: 3,
-+    orderBy: { createdAt: "desc" },
++    include: {
++      _count: {
++        select: { registrations: true, teams: true },
++      },
++    },
++    orderBy: { createdAt: "asc" },
 +  });
 +
-   return (
--    <div className="min-h-screen flex items-center justify-center bg-zinc-50">
--      <main className="text-center p-8 bg-white rounded-xl shadow-sm border border-zinc-200">
--        <h1 className="text-4xl font-bold tracking-tight text-zinc-900 mb-4">
--          GSB Lomba 17-an
--        </h1>
--        <p className="text-lg text-zinc-600">
--          Aplikasi Pendaftaran dan Manajemen Lomba Kemerdekaan Green Serpong Bintaro.
--        </p>
--      </main>
--    </div>
-+    <main className="flex flex-col items-center w-full min-h-screen relative overflow-hidden">
-+      <BuntingStrip />
++  return (
++    <div className="space-y-6">
++      <div>
++        <h1 className="text-3xl font-bold tracking-tight text-arang">Dashboard Admin</h1>
++        <p className="text-gray-500 mt-2">Ringkasan status perlombaan GSB.</p>
++      </div>
 +
-+      <div className="flex flex-col items-center text-center mt-24 px-6 gap-6 max-w-md w-full">
-+        <div className="flex flex-col gap-1 items-center">
-+          <p className="font-anton text-merah text-xl tracking-widest">DIRGAHAYU RI KE-81</p>
-+          <h1 className="font-anton text-5xl text-arang tracking-wide">
-+            L O M B A <br /> 1 7 - A N
-+          </h1>
-+          <p className="font-jakarta font-medium text-arang/80 text-lg mt-2">
-+            Green Serpong Bintaro
-+          </p>
-+        </div>
-+
-+        <div className="mt-8 w-full flex flex-col items-center">
-+          <p className="font-anton text-arang/60 text-lg mb-2">MENUJU 17 AGUSTUS</p>
-+          <Countdown />
-+        </div>
-+
-+        {competitions.length > 0 && (
-+          <Card className="mt-8 w-full border-border">
++      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
++        {competitions.map((comp) => (
++          <Card key={comp.id} className="border-gray-200">
 +            <CardHeader className="pb-3">
-+              <CardTitle className="font-anton text-2xl text-merah">LINEUP LOMBA</CardTitle>
++              <div className="flex justify-between items-start">
++                <CardTitle className="text-xl text-merah">{comp.name}</CardTitle>
++                <Badge 
++                  variant={comp.status === "REGISTRATION" ? "default" : "secondary"}
++                  className={comp.status === "REGISTRATION" ? "bg-emas text-arang hover:bg-emas/80" : ""}
++                >
++                  {comp.status}
++                </Badge>
++              </div>
++              <CardDescription className="text-xs text-gray-500">
++                {comp.teamSize === 1 ? "Perorangan" : comp.teamSize === 2 ? "Ganda" : "3v3"} | {comp.pairingMode} | {comp.bracketFormat}
++              </CardDescription>
 +            </CardHeader>
 +            <CardContent>
-+              <ul className="flex flex-col gap-2">
-+                {competitions.map(comp => (
-+                  <li key={comp.id} className="flex justify-between items-center bg-surface border border-arang/10 p-3 rounded-md">
-+                    <span className="font-semibold text-arang">{comp.name}</span>
-+                    <span className="text-sm font-jetbrains bg-arang/5 text-arang px-2 py-1 rounded">
-+                      {comp.teamSize === 1 ? 'Perorangan' : comp.teamSize === 2 ? 'Ganda' : `${comp.teamSize}v${comp.teamSize}`}
-+                    </span>
-+                  </li>
-+                ))}
-+              </ul>
++              <div className="flex justify-between items-center mb-4 text-sm">
++                <div>
++                  <span className="font-semibold">{comp._count.registrations}</span> Peserta
++                </div>
++                <div>
++                  <span className="font-semibold">{comp._count.teams}</span> Tim
++                </div>
++              </div>
++              <div className="flex gap-2">
++                <Link href={`/admin/lomba/${comp.slug}`} className="inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all h-8 px-2.5 w-full bg-merah hover:bg-merah-tua text-white">
++                  Kelola
++                </Link>
++              </div>
 +            </CardContent>
 +          </Card>
-+        )}
-+
-+        <div className="mt-6 w-full mb-12">
-+          <Link href="/lomba" className="inline-flex items-center justify-center w-full bg-merah hover:bg-merah-tua text-putih-kertas text-lg py-6 rounded-xl font-bold transition-colors">
-+            Daftar Lomba
-+          </Link>
-+        </div>
-+      </div>
-+    </main>
-   );
- }
-diff --git a/src/components/bunting-strip.tsx b/src/components/bunting-strip.tsx
-new file mode 100644
-index 0000000..5a179bd
---- /dev/null
-+++ b/src/components/bunting-strip.tsx
-@@ -0,0 +1,13 @@
-+export function BuntingStrip() {
-+  return (
-+    <div className="w-full overflow-hidden whitespace-nowrap flex py-2 select-none" aria-hidden="true">
-+      <div className="flex gap-2">
-+        {Array.from({ length: 100 }).map((_, i) => (
-+          <span key={i} className={`text-xl ${i % 2 === 0 ? "text-merah" : "text-emas"}`}>
-+            {i % 2 === 0 ? "▼" : "▲"}
-+          </span>
 +        ))}
++        {competitions.length === 0 && (
++          <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-lg border border-dashed border-gray-300">
++            Belum ada perlombaan yang dikonfigurasi.
++          </div>
++        )}
 +      </div>
 +    </div>
 +  );
 +}
-diff --git a/src/components/countdown.tsx b/src/components/countdown.tsx
+diff --git a/src/app/admin/(guarded)/peserta/page.tsx b/src/app/admin/(guarded)/peserta/page.tsx
 new file mode 100644
-index 0000000..2503173
+index 0000000..c00fe6a
 --- /dev/null
-+++ b/src/components/countdown.tsx
-@@ -0,0 +1,56 @@
-+"use client";
++++ b/src/app/admin/(guarded)/peserta/page.tsx
+@@ -0,0 +1,67 @@
++import prisma from "@/lib/prisma";
++import { 
++  Table, 
++  TableBody, 
++  TableCell, 
++  TableHead, 
++  TableHeader, 
++  TableRow 
++} from "@/components/ui/table";
++import { Badge } from "@/components/ui/badge";
 +
-+import { useEffect, useState } from "react";
-+
-+export function Countdown() {
-+  const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
-+
-+  useEffect(() => {
-+    // 17 Agustus 2026 (assuming 2026 based on KE-81, since 1945 + 81 = 2026)
-+    const target = new Date("2026-08-17T00:00:00+07:00").getTime();
-+
-+    const interval = setInterval(() => {
-+      const now = new Date().getTime();
-+      const distance = target - now;
-+
-+      if (distance < 0) {
-+        clearInterval(interval);
-+        setTimeLeft({ d: 0, h: 0, m: 0, s: 0 });
-+      } else {
-+        setTimeLeft({
-+          d: Math.floor(distance / (1000 * 60 * 60 * 24)),
-+          h: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-+          m: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-+          s: Math.floor((distance % (1000 * 60)) / 1000),
-+        });
++export default async function ParticipantsPage() {
++  const participants = await prisma.participant.findMany({
++    include: {
++      registrations: {
++        include: { competition: true }
 +      }
-+    }, 1000);
-+
-+    return () => clearInterval(interval);
-+  }, []);
-+
-+  if (!timeLeft) {
-+    return <div className="h-[80px]" />; // Placeholder to avoid layout shift
-+  }
++    },
++    orderBy: { createdAt: 'desc' }
++  });
 +
 +  return (
-+    <div className="flex gap-4 text-center">
-+      <div className="flex flex-col items-center">
-+        <span className="font-jetbrains text-4xl font-bold text-merah">{String(timeLeft.d).padStart(2, "0")}</span>
-+        <span className="text-xs font-semibold tracking-wider text-arang/60">HARI</span>
++    <div className="space-y-6">
++      <div>
++        <h1 className="text-3xl font-bold tracking-tight text-arang">Master Data Peserta</h1>
++        <p className="text-gray-500 mt-2">Seluruh warga yang mendaftar perlombaan.</p>
 +      </div>
-+      <div className="flex flex-col items-center">
-+        <span className="font-jetbrains text-4xl font-bold text-merah">{String(timeLeft.h).padStart(2, "0")}</span>
-+        <span className="text-xs font-semibold tracking-wider text-arang/60">JAM</span>
-+      </div>
-+      <div className="flex flex-col items-center">
-+        <span className="font-jetbrains text-4xl font-bold text-merah">{String(timeLeft.m).padStart(2, "0")}</span>
-+        <span className="text-xs font-semibold tracking-wider text-arang/60">MNT</span>
-+      </div>
-+      <div className="flex flex-col items-center">
-+        <span className="font-jetbrains text-4xl font-bold text-merah">{String(timeLeft.s).padStart(2, "0")}</span>
-+        <span className="text-xs font-semibold tracking-wider text-arang/60">DTK</span>
++
++      <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
++        <Table>
++          <TableHeader>
++            <TableRow>
++              <TableHead>Nama</TableHead>
++              <TableHead>No. HP</TableHead>
++              <TableHead>Blok/Rumah</TableHead>
++              <TableHead>Perlombaan Diikuti</TableHead>
++            </TableRow>
++          </TableHeader>
++          <TableBody>
++            {participants.length === 0 ? (
++              <TableRow>
++                <TableCell colSpan={4} className="text-center py-6 text-gray-500">Belum ada peserta.</TableCell>
++              </TableRow>
++            ) : (
++              participants.map(p => (
++                <TableRow key={p.id}>
++                  <TableCell className="font-medium">{p.name}</TableCell>
++                  <TableCell>{p.phone}</TableCell>
++                  <TableCell>{p.houseBlock} - {p.houseNumber}</TableCell>
++                  <TableCell>
++                    <div className="flex flex-wrap gap-1">
++                      {p.registrations.map(reg => (
++                        <Badge key={reg.id} variant="outline" className="text-xs bg-gray-50">
++                          {reg.competition.name}
++                        </Badge>
++                      ))}
++                    </div>
++                  </TableCell>
++                </TableRow>
++              ))
++            )}
++          </TableBody>
++        </Table>
 +      </div>
 +    </div>
 +  );
 +}
-diff --git a/src/components/registration-form.tsx b/src/components/registration-form.tsx
+diff --git a/src/app/admin/actions.ts b/src/app/admin/actions.ts
 new file mode 100644
-index 0000000..bbbe96c
+index 0000000..fabcdb0
 --- /dev/null
-+++ b/src/components/registration-form.tsx
-@@ -0,0 +1,121 @@
++++ b/src/app/admin/actions.ts
+@@ -0,0 +1,18 @@
++"use server";
++
++import { cookies } from "next/headers";
++import { redirect } from "next/navigation";
++
++export async function loginAction(prevState: unknown, formData: FormData) {
++  const password = formData.get("password");
++  if (password === "admin123") {
++    (await cookies()).set("admin_auth", "true", { path: "/" });
++    redirect("/admin");
++  }
++  return { error: "Invalid password" };
++}
++
++export async function logoutAction() {
++  (await cookies()).delete("admin_auth");
++  redirect("/admin/login");
++}
+diff --git a/src/app/admin/login/login-form.tsx b/src/app/admin/login/login-form.tsx
+new file mode 100644
+index 0000000..7c276c5
+--- /dev/null
++++ b/src/app/admin/login/login-form.tsx
+@@ -0,0 +1,36 @@
 +"use client";
 +
-+import { useActionState, useRef, useEffect } from "react";
-+import { registerAction } from "@/app/actions";
++import { useActionState } from "react";
++import { loginAction } from "../actions";
 +import { Button } from "@/components/ui/button";
 +import { Input } from "@/components/ui/input";
 +import { Label } from "@/components/ui/label";
-+import { toast } from "sonner";
-+import { useForm } from "react-hook-form";
-+import { zodResolver } from "@hookform/resolvers/zod";
-+import { registerSchema, RegisterFormData } from "@/lib/validations";
 +
-+export function RegistrationForm({ competitionId }: { competitionId: string }) {
-+  const [state, formAction, isPending] = useActionState(registerAction, null);
-+  const formRef = useRef<HTMLFormElement>(null);
-+
-+  const {
-+    register,
-+    trigger,
-+    formState: { errors },
-+  } = useForm<RegisterFormData>({
-+    resolver: zodResolver(registerSchema),
-+    mode: "onChange",
-+    defaultValues: {
-+      competitionId,
-+      name: "",
-+      houseBlock: "",
-+      houseNumber: "",
-+      phone: "",
-+    },
-+  });
-+
-+  useEffect(() => {
-+    if (state && !isPending) {
-+      if (state.error) {
-+        toast.error(state.message, { id: "action-error" });
-+      } else {
-+        toast.success(state.message, { id: "action-success" });
-+        formRef.current?.reset();
-+      }
-+    }
-+  }, [state, isPending]);
++export function LoginForm() {
++  const [state, formAction, pending] = useActionState(loginAction, null);
 +
 +  return (
-+    <form 
-+      ref={formRef}
-+      action={formAction} 
-+      onSubmit={async (e) => {
-+        const isValid = await trigger();
-+        if (!isValid) {
-+          e.preventDefault(); // Prevent server action if client validation fails
-+        }
-+      }}
-+      className="flex flex-col gap-5 mt-6"
-+    >
-+      <input type="hidden" {...register("competitionId")} />
-+      
-+      <div className="flex flex-col gap-2">
-+        <Label htmlFor="name" className="text-arang font-semibold">Nama Lengkap</Label>
++    <form action={formAction} className="space-y-4">
++      <div className="space-y-2">
++        <Label htmlFor="password">Password (admin123)</Label>
 +        <Input 
-+          id="name" 
-+          placeholder="Budi Santoso" 
-+          className="border-arang/20 focus-visible:ring-merah"
-+          {...register("name")}
++          id="password" 
++          name="password" 
++          type="password" 
++          required 
++          className="border-gray-300 focus:border-merah focus:ring-merah"
 +        />
-+        {errors.name && (
-+          <p className="text-merah-tua text-xs">{errors.name.message}</p>
-+        )}
 +      </div>
-+
-+      <div className="flex gap-4">
-+        <div className="flex flex-col gap-2 flex-1">
-+          <Label htmlFor="houseBlock" className="text-arang font-semibold">Blok Rumah</Label>
-+          <Input 
-+            id="houseBlock" 
-+            placeholder="C3" 
-+            className="border-arang/20 focus-visible:ring-merah"
-+            {...register("houseBlock")}
-+          />
-+          {errors.houseBlock && (
-+            <p className="text-merah-tua text-xs">{errors.houseBlock.message}</p>
-+          )}
-+        </div>
-+        <div className="flex flex-col gap-2 flex-1">
-+          <Label htmlFor="houseNumber" className="text-arang font-semibold">Nomor</Label>
-+          <Input 
-+            id="houseNumber" 
-+            placeholder="12A" 
-+            className="border-arang/20 focus-visible:ring-merah"
-+            {...register("houseNumber")}
-+          />
-+          {errors.houseNumber && (
-+            <p className="text-merah-tua text-xs">{errors.houseNumber.message}</p>
-+          )}
-+        </div>
-+      </div>
-+
-+      <div className="flex flex-col gap-2">
-+        <Label htmlFor="phone" className="text-arang font-semibold">Nomor WhatsApp</Label>
-+        <Input 
-+          id="phone" 
-+          type="tel"
-+          placeholder="08123456789" 
-+          className="border-arang/20 focus-visible:ring-merah"
-+          {...register("phone")}
-+        />
-+        {errors.phone && (
-+          <p className="text-merah-tua text-xs">{errors.phone.message}</p>
-+        )}
-+      </div>
-+
++      {state?.error && (
++        <p className="text-sm text-red-600">{state.error}</p>
++      )}
 +      <Button 
 +        type="submit" 
-+        disabled={isPending}
-+        className="w-full bg-merah hover:bg-merah-tua text-putih-kertas text-lg py-6 rounded-[12px] font-bold mt-2"
++        className="w-full bg-merah hover:bg-merah-tua text-white"
++        disabled={pending}
 +      >
-+        {isPending ? "Mendaftar..." : "Daftar Lomba"}
++        {pending ? "Logging in..." : "Login"}
 +      </Button>
 +    </form>
 +  );
 +}
-diff --git a/src/components/ui/card.tsx b/src/components/ui/card.tsx
+diff --git a/src/app/admin/login/page.tsx b/src/app/admin/login/page.tsx
 new file mode 100644
-index 0000000..4458dae
+index 0000000..75c49b2
 --- /dev/null
-+++ b/src/components/ui/card.tsx
-@@ -0,0 +1,103 @@
-+import * as React from "react"
++++ b/src/app/admin/login/page.tsx
+@@ -0,0 +1,19 @@
++import { cookies } from "next/headers";
++import { redirect } from "next/navigation";
++import { LoginForm } from "./login-form";
++
++export default async function LoginPage() {
++  const authCookie = (await cookies()).get("admin_auth");
++  if (authCookie?.value === "true") {
++    redirect("/admin");
++  }
++
++  return (
++    <div className="min-h-screen bg-putih-kertas flex items-center justify-center p-4">
++      <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md border border-gray-100">
++        <h1 className="text-2xl font-bold text-merah mb-6 text-center">Admin Login</h1>
++        <LoginForm />
++      </div>
++    </div>
++  );
++}
+diff --git a/src/components/ui/badge.tsx b/src/components/ui/badge.tsx
+new file mode 100644
+index 0000000..b20959d
+--- /dev/null
++++ b/src/components/ui/badge.tsx
+@@ -0,0 +1,52 @@
++import { mergeProps } from "@base-ui/react/merge-props"
++import { useRender } from "@base-ui/react/use-render"
++import { cva, type VariantProps } from "class-variance-authority"
 +
 +import { cn } from "@/lib/utils"
 +
-+function Card({
++const badgeVariants = cva(
++  "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
++  {
++    variants: {
++      variant: {
++        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
++        secondary:
++          "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
++        destructive:
++          "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
++        outline:
++          "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
++        ghost:
++          "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
++        link: "text-primary underline-offset-4 hover:underline",
++      },
++    },
++    defaultVariants: {
++      variant: "default",
++    },
++  }
++)
++
++function Badge({
 +  className,
-+  size = "default",
++  variant = "default",
++  render,
 +  ...props
-+}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
++}: useRender.ComponentProps<"span"> & VariantProps<typeof badgeVariants>) {
++  return useRender({
++    defaultTagName: "span",
++    props: mergeProps<"span">(
++      {
++        className: cn(badgeVariants({ variant }), className),
++      },
++      props
++    ),
++    render,
++    state: {
++      slot: "badge",
++      variant,
++    },
++  })
++}
++
++export { Badge, badgeVariants }
+diff --git a/src/components/ui/dialog.tsx b/src/components/ui/dialog.tsx
+new file mode 100644
+index 0000000..014f5aa
+--- /dev/null
++++ b/src/components/ui/dialog.tsx
+@@ -0,0 +1,160 @@
++"use client"
++
++import * as React from "react"
++import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
++
++import { cn } from "@/lib/utils"
++import { Button } from "@/components/ui/button"
++import { XIcon } from "lucide-react"
++
++function Dialog({ ...props }: DialogPrimitive.Root.Props) {
++  return <DialogPrimitive.Root data-slot="dialog" {...props} />
++}
++
++function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
++  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
++}
++
++function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
++  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
++}
++
++function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
++  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
++}
++
++function DialogOverlay({
++  className,
++  ...props
++}: DialogPrimitive.Backdrop.Props) {
 +  return (
-+    <div
-+      data-slot="card"
-+      data-size={size}
++    <DialogPrimitive.Backdrop
++      data-slot="dialog-overlay"
 +      className={cn(
-+        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
++        "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
 +        className
 +      )}
 +      {...props}
@@ -2077,12 +511,90 @@ index 0000000..4458dae
 +  )
 +}
 +
-+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
++function DialogContent({
++  className,
++  children,
++  showCloseButton = true,
++  ...props
++}: DialogPrimitive.Popup.Props & {
++  showCloseButton?: boolean
++}) {
++  return (
++    <DialogPortal>
++      <DialogOverlay />
++      <DialogPrimitive.Popup
++        data-slot="dialog-content"
++        className={cn(
++          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
++          className
++        )}
++        {...props}
++      >
++        {children}
++        {showCloseButton && (
++          <DialogPrimitive.Close
++            data-slot="dialog-close"
++            render={
++              <Button
++                variant="ghost"
++                className="absolute top-2 right-2"
++                size="icon-sm"
++              />
++            }
++          >
++            <XIcon
++            />
++            <span className="sr-only">Close</span>
++          </DialogPrimitive.Close>
++        )}
++      </DialogPrimitive.Popup>
++    </DialogPortal>
++  )
++}
++
++function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
 +  return (
 +    <div
-+      data-slot="card-header"
++      data-slot="dialog-header"
++      className={cn("flex flex-col gap-2", className)}
++      {...props}
++    />
++  )
++}
++
++function DialogFooter({
++  className,
++  showCloseButton = false,
++  children,
++  ...props
++}: React.ComponentProps<"div"> & {
++  showCloseButton?: boolean
++}) {
++  return (
++    <div
++      data-slot="dialog-footer"
 +      className={cn(
-+        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-(--card-spacing) has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-(--card-spacing)",
++        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end",
++        className
++      )}
++      {...props}
++    >
++      {children}
++      {showCloseButton && (
++        <DialogPrimitive.Close render={<Button variant="outline" />}>
++          Close
++        </DialogPrimitive.Close>
++      )}
++    </div>
++  )
++}
++
++function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
++  return (
++    <DialogPrimitive.Title
++      data-slot="dialog-title"
++      className={cn(
++        "font-heading text-base leading-none font-medium",
 +        className
 +      )}
 +      {...props}
@@ -2090,58 +602,15 @@ index 0000000..4458dae
 +  )
 +}
 +
-+function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
++function DialogDescription({
++  className,
++  ...props
++}: DialogPrimitive.Description.Props) {
 +  return (
-+    <div
-+      data-slot="card-title"
++    <DialogPrimitive.Description
++      data-slot="dialog-description"
 +      className={cn(
-+        "font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
-+        className
-+      )}
-+      {...props}
-+    />
-+  )
-+}
-+
-+function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
-+  return (
-+    <div
-+      data-slot="card-description"
-+      className={cn("text-sm text-muted-foreground", className)}
-+      {...props}
-+    />
-+  )
-+}
-+
-+function CardAction({ className, ...props }: React.ComponentProps<"div">) {
-+  return (
-+    <div
-+      data-slot="card-action"
-+      className={cn(
-+        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
-+        className
-+      )}
-+      {...props}
-+    />
-+  )
-+}
-+
-+function CardContent({ className, ...props }: React.ComponentProps<"div">) {
-+  return (
-+    <div
-+      data-slot="card-content"
-+      className={cn("px-(--card-spacing)", className)}
-+      {...props}
-+    />
-+  )
-+}
-+
-+function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
-+  return (
-+    <div
-+      data-slot="card-footer"
-+      className={cn(
-+        "flex items-center rounded-b-xl border-t bg-muted/50 p-(--card-spacing)",
++        "text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
 +        className
 +      )}
 +      {...props}
@@ -2150,32 +619,108 @@ index 0000000..4458dae
 +}
 +
 +export {
-+  Card,
-+  CardHeader,
-+  CardFooter,
-+  CardTitle,
-+  CardAction,
-+  CardDescription,
-+  CardContent,
++  Dialog,
++  DialogClose,
++  DialogContent,
++  DialogDescription,
++  DialogFooter,
++  DialogHeader,
++  DialogOverlay,
++  DialogPortal,
++  DialogTitle,
++  DialogTrigger,
 +}
-diff --git a/src/components/ui/input.tsx b/src/components/ui/input.tsx
+diff --git a/src/components/ui/switch.tsx b/src/components/ui/switch.tsx
 new file mode 100644
-index 0000000..7d21bab
+index 0000000..9b8b44b
 --- /dev/null
-+++ b/src/components/ui/input.tsx
-@@ -0,0 +1,20 @@
-+import * as React from "react"
-+import { Input as InputPrimitive } from "@base-ui/react/input"
++++ b/src/components/ui/switch.tsx
+@@ -0,0 +1,32 @@
++"use client"
++
++import { Switch as SwitchPrimitive } from "@base-ui/react/switch"
 +
 +import { cn } from "@/lib/utils"
 +
-+function Input({ className, type, ...props }: React.ComponentProps<"input">) {
++function Switch({
++  className,
++  size = "default",
++  ...props
++}: SwitchPrimitive.Root.Props & {
++  size?: "sm" | "default"
++}) {
 +  return (
-+    <InputPrimitive
-+      type={type}
-+      data-slot="input"
++    <SwitchPrimitive.Root
++      data-slot="switch"
++      data-size={size}
 +      className={cn(
-+        "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
++        "peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent transition-all outline-none after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px] dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:bg-primary data-unchecked:bg-input dark:data-unchecked:bg-input/80 data-disabled:cursor-not-allowed data-disabled:opacity-50",
++        className
++      )}
++      {...props}
++    >
++      <SwitchPrimitive.Thumb
++        data-slot="switch-thumb"
++        className="pointer-events-none block rounded-full bg-background ring-0 transition-transform group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 group-data-[size=default]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=sm]/switch:data-checked:translate-x-[calc(100%-2px)] dark:data-checked:bg-primary-foreground group-data-[size=default]/switch:data-unchecked:translate-x-0 group-data-[size=sm]/switch:data-unchecked:translate-x-0 dark:data-unchecked:bg-foreground"
++      />
++    </SwitchPrimitive.Root>
++  )
++}
++
++export { Switch }
+diff --git a/src/components/ui/table.tsx b/src/components/ui/table.tsx
+new file mode 100644
+index 0000000..abeaced
+--- /dev/null
++++ b/src/components/ui/table.tsx
+@@ -0,0 +1,116 @@
++"use client"
++
++import * as React from "react"
++
++import { cn } from "@/lib/utils"
++
++function Table({ className, ...props }: React.ComponentProps<"table">) {
++  return (
++    <div
++      data-slot="table-container"
++      className="relative w-full overflow-x-auto"
++    >
++      <table
++        data-slot="table"
++        className={cn("w-full caption-bottom text-sm", className)}
++        {...props}
++      />
++    </div>
++  )
++}
++
++function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
++  return (
++    <thead
++      data-slot="table-header"
++      className={cn("[&_tr]:border-b", className)}
++      {...props}
++    />
++  )
++}
++
++function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
++  return (
++    <tbody
++      data-slot="table-body"
++      className={cn("[&_tr:last-child]:border-0", className)}
++      {...props}
++    />
++  )
++}
++
++function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
++  return (
++    <tfoot
++      data-slot="table-footer"
++      className={cn(
++        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
 +        className
 +      )}
 +      {...props}
@@ -2183,25 +728,12 @@ index 0000000..7d21bab
 +  )
 +}
 +
-+export { Input }
-diff --git a/src/components/ui/label.tsx b/src/components/ui/label.tsx
-new file mode 100644
-index 0000000..74da65c
---- /dev/null
-+++ b/src/components/ui/label.tsx
-@@ -0,0 +1,20 @@
-+"use client"
-+
-+import * as React from "react"
-+
-+import { cn } from "@/lib/utils"
-+
-+function Label({ className, ...props }: React.ComponentProps<"label">) {
++function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
 +  return (
-+    <label
-+      data-slot="label"
++    <tr
++      data-slot="table-row"
 +      className={cn(
-+        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
++        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
 +        className
 +      )}
 +      {...props}
@@ -2209,126 +741,140 @@ index 0000000..74da65c
 +  )
 +}
 +
-+export { Label }
-diff --git a/src/components/ui/sonner.tsx b/src/components/ui/sonner.tsx
-new file mode 100644
-index 0000000..9280ee5
---- /dev/null
-+++ b/src/components/ui/sonner.tsx
-@@ -0,0 +1,49 @@
-+"use client"
-+
-+import { useTheme } from "next-themes"
-+import { Toaster as Sonner, type ToasterProps } from "sonner"
-+import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
-+
-+const Toaster = ({ ...props }: ToasterProps) => {
-+  const { theme = "system" } = useTheme()
-+
++function TableHead({ className, ...props }: React.ComponentProps<"th">) {
 +  return (
-+    <Sonner
-+      theme={theme as ToasterProps["theme"]}
-+      className="toaster group"
-+      icons={{
-+        success: (
-+          <CircleCheckIcon className="size-4" />
-+        ),
-+        info: (
-+          <InfoIcon className="size-4" />
-+        ),
-+        warning: (
-+          <TriangleAlertIcon className="size-4" />
-+        ),
-+        error: (
-+          <OctagonXIcon className="size-4" />
-+        ),
-+        loading: (
-+          <Loader2Icon className="size-4 animate-spin" />
-+        ),
-+      }}
-+      style={
-+        {
-+          "--normal-bg": "var(--popover)",
-+          "--normal-text": "var(--popover-foreground)",
-+          "--normal-border": "var(--border)",
-+          "--border-radius": "var(--radius)",
-+        } as React.CSSProperties
-+      }
-+      toastOptions={{
-+        classNames: {
-+          toast: "cn-toast",
-+        },
-+      }}
++    <th
++      data-slot="table-head"
++      className={cn(
++        "h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
++        className
++      )}
 +      {...props}
 +    />
 +  )
 +}
 +
-+export { Toaster }
-diff --git a/src/lib/prisma.ts b/src/lib/prisma.ts
-index 08a8751..8917772 100644
---- a/src/lib/prisma.ts
-+++ b/src/lib/prisma.ts
-@@ -1,7 +1,17 @@
- import { PrismaClient } from '@prisma/client'
- 
- const prismaClientSingleton = () => {
--  return new PrismaClient()
-+  try {
-+    return new PrismaClient()
-+  } catch (e) {
-+    console.warn("Failed to initialize PrismaClient:", e);
-+    // Mock client for build time if constructor fails
-+    return {
-+      competition: { findMany: async () => [] },
-+      participant: { findUnique: async () => null, upsert: async () => ({}) },
-+      registration: { findUnique: async () => null, create: async () => ({}) },
-+    } as unknown as PrismaClient;
-+  }
- }
- 
- declare const globalThis: {
-diff --git a/src/lib/validations.ts b/src/lib/validations.ts
++function TableCell({ className, ...props }: React.ComponentProps<"td">) {
++  return (
++    <td
++      data-slot="table-cell"
++      className={cn(
++        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
++        className
++      )}
++      {...props}
++    />
++  )
++}
++
++function TableCaption({
++  className,
++  ...props
++}: React.ComponentProps<"caption">) {
++  return (
++    <caption
++      data-slot="table-caption"
++      className={cn("mt-4 text-sm text-muted-foreground", className)}
++      {...props}
++    />
++  )
++}
++
++export {
++  Table,
++  TableHeader,
++  TableBody,
++  TableFooter,
++  TableHead,
++  TableRow,
++  TableCell,
++  TableCaption,
++}
+diff --git a/src/components/ui/tabs.tsx b/src/components/ui/tabs.tsx
 new file mode 100644
-index 0000000..8fff838
+index 0000000..8ee8054
 --- /dev/null
-+++ b/src/lib/validations.ts
-@@ -0,0 +1,21 @@
-+import { z } from "zod";
++++ b/src/components/ui/tabs.tsx
+@@ -0,0 +1,82 @@
++"use client"
 +
-+const phoneRegex = /^(?:\+62|08)[0-9]{7,13}$/;
++import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"
++import { cva, type VariantProps } from "class-variance-authority"
 +
-+export const registerSchema = z.object({
-+  competitionId: z.string().min(1),
-+  name: z.string().min(2, "Nama minimal 2 karakter"),
-+  houseBlock: z.string().min(1, "Blok rumah wajib diisi"),
-+  houseNumber: z.string().min(1, "Nomor rumah wajib diisi"),
-+  phone: z.string()
-+    .regex(phoneRegex, "Nomor HP harus diawali dengan 08 atau +62")
-+    .transform((val) => {
-+      // Normalize to 08... format
-+      if (val.startsWith("+62")) {
-+        return "0" + val.slice(3);
-+      }
-+      return val;
-+    }),
-+});
++import { cn } from "@/lib/utils"
 +
-+export type RegisterFormData = z.infer<typeof registerSchema>;
-diff --git a/vitest.config.ts b/vitest.config.ts
-new file mode 100644
-index 0000000..afc03fe
---- /dev/null
-+++ b/vitest.config.ts
-@@ -0,0 +1,11 @@
-+import { defineConfig } from "vitest/config";
++function Tabs({
++  className,
++  orientation = "horizontal",
++  ...props
++}: TabsPrimitive.Root.Props) {
++  return (
++    <TabsPrimitive.Root
++      data-slot="tabs"
++      data-orientation={orientation}
++      className={cn(
++        "group/tabs flex gap-2 data-horizontal:flex-col",
++        className
++      )}
++      {...props}
++    />
++  )
++}
 +
-+export default defineConfig({
-+  test: {
-+    environment: "node",
-+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
-+    alias: {
-+      "@/": "/src/",
++const tabsListVariants = cva(
++  "group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none",
++  {
++    variants: {
++      variant: {
++        default: "bg-muted",
++        line: "gap-1 bg-transparent",
++      },
 +    },
-+  },
-+});
++    defaultVariants: {
++      variant: "default",
++    },
++  }
++)
++
++function TabsList({
++  className,
++  variant = "default",
++  ...props
++}: TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants>) {
++  return (
++    <TabsPrimitive.List
++      data-slot="tabs-list"
++      data-variant={variant}
++      className={cn(tabsListVariants({ variant }), className)}
++      {...props}
++    />
++  )
++}
++
++function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
++  return (
++    <TabsPrimitive.Tab
++      data-slot="tabs-trigger"
++      className={cn(
++        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
++        "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent",
++        "data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground",
++        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100",
++        className
++      )}
++      {...props}
++    />
++  )
++}
++
++function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
++  return (
++    <TabsPrimitive.Panel
++      data-slot="tabs-content"
++      className={cn("flex-1 text-sm outline-none", className)}
++      {...props}
++    />
++  )
++}
++
++export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }
