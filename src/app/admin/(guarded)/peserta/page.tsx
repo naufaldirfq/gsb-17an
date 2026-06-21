@@ -8,17 +8,34 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
-export default async function ParticipantsPage() {
-  const participants = await prisma.participant.findMany({
-    take: 50,
+export default async function ParticipantsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
+  const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1;
+  const take = 50;
+  const skip = (page - 1) * take;
+
+  const [participants, totalCount] = await Promise.all([
+    prisma.participant.findMany({
+      take,
+      skip,
     include: {
       registrations: {
         include: { competition: true }
       }
     },
     orderBy: { createdAt: 'desc' }
-  });
+  }),
+    prisma.participant.count()
+  ]);
+
+  const totalPages = Math.ceil(totalCount / take);
 
   return (
     <div className="space-y-6">
@@ -63,6 +80,26 @@ export default async function ParticipantsPage() {
           </TableBody>
         </Table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <Link 
+            href={page > 1 ? `/admin/peserta?page=${page - 1}` : "#"}
+            className={buttonVariants({ variant: "outline", className: page <= 1 ? "pointer-events-none opacity-50" : "" })}
+          >
+            Prev
+          </Link>
+          <span className="text-sm text-gray-500">
+            Page {page} of {totalPages}
+          </span>
+          <Link 
+            href={page < totalPages ? `/admin/peserta?page=${page + 1}` : "#"}
+            className={buttonVariants({ variant: "outline", className: page >= totalPages ? "pointer-events-none opacity-50" : "" })}
+          >
+            Next
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

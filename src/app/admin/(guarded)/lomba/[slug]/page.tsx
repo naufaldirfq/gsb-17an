@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { RegistrationActions } from "./registration-actions";
 import { BracketActions } from "./bracket-actions";
+import { MatchScoreModal } from "./match-score-modal";
 
 export default async function CompetitionManagePage({
   params,
@@ -134,6 +135,7 @@ export default async function CompetitionManagePage({
                   <TableHead>Tim A</TableHead>
                   <TableHead>Tim B</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -148,6 +150,9 @@ export default async function CompetitionManagePage({
                         {match.status}
                       </Badge>
                       {match.winnerTeam && <span className="ml-2 text-sm text-green-600">Pemenang: {match.winnerTeam.name}</span>}
+                    </TableCell>
+                    <TableCell>
+                      {match.status !== "BYE" && <MatchScoreModal match={match} />}
                     </TableCell>
                   </TableRow>
                 ))}

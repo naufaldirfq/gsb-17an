@@ -8,7 +8,8 @@ import { MatchStatus, Slot } from "@prisma/client";
 
 async function verifyAuth() {
   const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
-  if (authCookie?.value !== "true") {
+  const expectedPassword = process.env.ADMIN_PASSWORD || "admin123";
+  if (authCookie?.value !== expectedPassword) {
     throw new Error("Unauthorized");
   }
 }
@@ -32,6 +33,13 @@ export async function closeRegistrationAction(competitionId: string) {
 export async function openRegistrationAction(competitionId: string) {
   try {
     await verifyAuth();
+    
+    const comp = await prisma.competition.findUnique({ where: { id: competitionId } });
+    if (!comp) return { error: "Competition not found" };
+    if (comp.status === "ONGOING" || comp.status === "DONE") {
+      return { error: "Cannot open registration after bracket has been generated." };
+    }
+
     await prisma.competition.update({
       where: { id: competitionId },
       data: { status: "REGISTRATION", registrationOpen: true },
@@ -212,7 +220,7 @@ export async function generateBracketAction(competitionId: string) {
 
       // Insert Matches
       await tx.match.createMany({
-        data: matches.map(m => ({
+        data: matches.slice().reverse().map(m => ({
           id: m.id,
           competitionId: m.competitionId,
           round: m.round,
@@ -240,5 +248,57 @@ export async function generateBracketAction(competitionId: string) {
   } catch (error) {
     console.error("Failed to generate bracket:", error);
     return { error: "Failed to generate bracket." };
+  }
+}
+
+export async function submitScoreAction(matchId: string, payload: { scoreA: number; scoreB: number; winnerTeamId: string }) {
+  try {
+    await verifyAuth();
+
+    const match = await prisma.match.findUnique({
+      where: { id: matchId },
+      include: { competition: true }
+    });
+
+    if (!match) return { error: "Match not found" };
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Update the current match
+      await tx.match.update({
+        where: { id: matchId },
+        data: {
+          scoreA: payload.scoreA,
+          scoreB: payload.scoreB,
+          winnerTeamId: payload.winnerTeamId,
+          status: "COMPLETED"
+        }
+      });
+
+      // 2. Advance winner to the next match if any
+      if (match.nextMatchId && payload.winnerTeamId) {
+        const updateData = match.nextSlot === "A" 
+          ? { teamAId: payload.winnerTeamId } 
+          : { teamBId: payload.winnerTeamId };
+          
+        await tx.match.update({
+          where: { id: match.nextMatchId },
+          data: updateData
+        });
+      } else if (!match.nextMatchId) {
+        // This is the final match, we can mark competition as DONE
+        await tx.competition.update({
+          where: { id: match.competitionId },
+          data: { status: "DONE" }
+        });
+      }
+    });
+
+    revalidatePath("/admin");
+    revalidatePath(`/admin/lomba/[slug]`, "page");
+    revalidatePath(`/lomba/[slug]/bagan`, "page");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to submit score:", error);
+    return { error: "Failed to submit score." };
   }
 }

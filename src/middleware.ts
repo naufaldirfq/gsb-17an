@@ -5,7 +5,8 @@ import { ADMIN_AUTH_COOKIE } from "@/lib/constants";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const authCookie = request.cookies.get(ADMIN_AUTH_COOKIE);
-  const isAuthenticated = authCookie?.value === "true";
+  const expectedPassword = process.env.ADMIN_PASSWORD || "admin123";
+  const isAuthenticated = authCookie?.value === expectedPassword;
 
   // If going to an admin route (not login) and not authenticated
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
