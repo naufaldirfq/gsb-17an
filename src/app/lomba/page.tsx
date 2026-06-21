@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
+export const dynamic = "force-dynamic";
+
 export default async function LombaList() {
   const competitions = await prisma.competition.findMany({
     where: { status: { not: "DRAFT" } },

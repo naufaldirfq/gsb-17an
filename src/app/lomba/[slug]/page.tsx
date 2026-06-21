@@ -5,6 +5,8 @@ import { RegistrationForm } from "@/components/registration-form";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { WhatsAppShare } from "./whatsapp-share";
 
+export const dynamic = "force-dynamic";
+
 export default async function LombaDetail({
   params,
 }: {

@@ -33,6 +33,11 @@ const createCompetitionSchema = z.object({
 });
 
 export async function createCompetitionAction(formData: FormData) {
+  const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
+  if (authCookie?.value !== "authenticated") {
+    return { error: "Unauthorized" };
+  }
+
   const rawName = formData.get("name") as string;
   const teamSize = parseInt(formData.get("teamSize") as string) || 1;
   const maxParticipantsRaw = formData.get("maxParticipants") as string;
@@ -52,9 +57,13 @@ export async function createCompetitionAction(formData: FormData) {
   }
 
   let slug = rawName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-  const existing = await prisma.competition.findUnique({ where: { slug } });
-  if (existing) {
-    slug = `${slug}-${Date.now().toString().slice(-4)}`;
+  if (!slug) {
+    slug = `lomba-${Date.now().toString().slice(-4)}`;
+  } else {
+    const existing = await prisma.competition.findUnique({ where: { slug } });
+    if (existing) {
+      slug = `${slug}-${Date.now().toString().slice(-4)}`;
+    }
   }
 
   try {

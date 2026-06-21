@@ -24,6 +24,16 @@ model Competition {
   registrations Registration[]
   teams         Team[]
   matches       Match[]
+  photos        Photo[]
+}
+
+model Photo {
+  id            String      @id @default(cuid())
+  url           String      // "/uploads/filename"
+  caption       String?
+  competitionId String
+  createdAt     DateTime    @default(now())
+  competition   Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
 }
 
 model Participant {

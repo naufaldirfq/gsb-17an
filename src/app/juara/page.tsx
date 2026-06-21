@@ -8,6 +8,8 @@ export const metadata = {
   description: "Daftar juara lomba Gema Semarak Bangsa",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function JuaraPage() {
   const competitions = await prisma.competition.findMany({
     where: {

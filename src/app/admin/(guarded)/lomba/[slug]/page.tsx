@@ -13,6 +13,8 @@ import { RegistrationActions } from "./registration-actions";
 import { BracketActions } from "./bracket-actions";
 import { MatchScoreModal } from "./match-score-modal";
 
+export const dynamic = "force-dynamic";
+
 export default async function CompetitionManagePage({
   params,
 }: {
