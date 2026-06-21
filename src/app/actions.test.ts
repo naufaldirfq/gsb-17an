@@ -48,7 +48,29 @@ describe("registerAction", () => {
     expect(result.message).toBe("Lomba tidak ditemukan.");
   });
 
-  it.todo("should fail if registration is closed");
+  it("should fail if registration is closed", async () => {
+    const formData = new FormData();
+    formData.append("competitionId", "closed-comp");
+    formData.append("name", "Budi");
+    formData.append("houseBlock", "C3");
+    formData.append("houseNumber", "12A");
+    formData.append("phone", "08123456789");
+
+    const prisma = (await import("@/lib/prisma")).default;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.competition.findUnique as any).mockResolvedValue({
+      id: "closed-comp",
+      _count: { registrations: 0 },
+      maxParticipants: null,
+      registrationOpen: false,
+      status: "LOCKED",
+    });
+
+    const result = await registerAction(null, formData);
+
+    expect(result.error).toBe(true);
+    expect(result.message).toBe("Pendaftaran lomba ini sudah ditutup.");
+  });
   
   it.todo("should fail if quota is full");
 

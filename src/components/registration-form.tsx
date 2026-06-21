@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useEffect } from "react";
+import { useActionState, useRef, useEffect, startTransition } from "react";
 import { registerAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,16 +44,21 @@ export function RegistrationForm({ competitionId }: { competitionId: string }) {
   return (
     <form 
       ref={formRef}
-      action={formAction} 
+      className="flex flex-col gap-5 mt-6"
       onSubmit={async (e) => {
+        e.preventDefault(); // Must be synchronous to stop the native browser submission
+        
+        const formData = new FormData(e.currentTarget);
         const isValid = await trigger();
-        if (!isValid) {
-          e.preventDefault(); // Prevent server action if client validation fails
+        
+        if (isValid) {
+          startTransition(() => {
+            formAction(formData); // Safely trigger the React 19 action manually
+          });
         }
       }}
-      className="flex flex-col gap-5 mt-6"
     >
-      <input type="hidden" {...register("competitionId")} />
+      <input type="hidden" name="competitionId" value={competitionId} />
       
       <div className="flex flex-col gap-2">
         <Label htmlFor="name" className="text-arang font-semibold">Nama Lengkap</Label>
