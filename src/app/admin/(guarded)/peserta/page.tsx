@@ -10,6 +10,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { DeleteButton } from "@/app/admin/(guarded)/delete-button";
+import { deleteParticipantAction } from "@/app/admin/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -54,12 +56,13 @@ export default async function ParticipantsPage({
               <TableHead>No. HP</TableHead>
               <TableHead>Blok/Rumah</TableHead>
               <TableHead>Perlombaan Diikuti</TableHead>
+              <TableHead className="w-[80px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {participants.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-6 text-gray-500">Belum ada peserta.</TableCell>
+                <TableCell colSpan={5} className="text-center py-6 text-gray-500">Belum ada peserta.</TableCell>
               </TableRow>
             ) : (
               participants.map(p => (
@@ -75,6 +78,16 @@ export default async function ParticipantsPage({
                         </Badge>
                       ))}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <DeleteButton
+                      id={p.id}
+                      action={deleteParticipantAction}
+                      confirmMessage={`Apakah Anda yakin ingin menghapus peserta "${p.name}"? Semua pendaftaran dan tim yang bersangkutan akan ikut dihapus.`}
+                      size="icon"
+                      variant="ghost"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                    />
                   </TableCell>
                 </TableRow>
               ))

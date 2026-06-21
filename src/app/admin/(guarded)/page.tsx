@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AddCompetitionModal } from "./add-competition-modal";
+import { Printer } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,17 @@ export default async function AdminDashboardPage() {
           <h1 className="text-3xl font-bold tracking-tight text-arang">Dashboard Admin</h1>
           <p className="text-gray-500 mt-2">Ringkasan status perlombaan GSB.</p>
         </div>
-        <AddCompetitionModal />
+        <div className="flex items-center gap-3">
+          <a
+            href="/admin/print/laporan"
+            target="_blank"
+            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-sm font-semibold text-gray-700 h-10 px-4 gap-2 transition-colors shadow-sm cursor-pointer"
+          >
+            <Printer className="h-4 w-4" />
+            Cetak Laporan Event
+          </a>
+          <AddCompetitionModal />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

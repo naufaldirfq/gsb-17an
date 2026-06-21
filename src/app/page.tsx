@@ -9,7 +9,6 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const competitions = await prisma.competition.findMany({
     where: { status: { not: "DRAFT" } },
-    take: 3,
     orderBy: { createdAt: "desc" },
   });
 
@@ -57,9 +56,6 @@ export default async function Home() {
           <Link href="/lomba" className="inline-flex items-center justify-center w-full bg-merah hover:bg-merah-tua text-putih-kertas text-lg py-6 rounded-xl font-bold transition-colors">
             Daftar Lomba
           </Link>
-          <a href="/print/laporan" target="_blank" className="inline-flex items-center justify-center bg-gray-800 hover:bg-gray-900 text-white py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors">
-            Cetak Laporan Event 🖨️
-          </a>
         </div>
       </div>
     </main>

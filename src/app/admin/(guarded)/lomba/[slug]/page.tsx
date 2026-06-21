@@ -13,6 +13,8 @@ import { RegistrationActions } from "./registration-actions";
 import { BracketActions } from "./bracket-actions";
 import { MatchScoreModal } from "./match-score-modal";
 import { MatchScheduleModal } from "./match-schedule-modal";
+import { DeleteButton } from "@/app/admin/(guarded)/delete-button";
+import { deleteRegistrationAction } from "@/app/admin/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -78,12 +80,13 @@ export default async function CompetitionManagePage({
               <TableHead>No. HP</TableHead>
               <TableHead>Blok/Rumah</TableHead>
               <TableHead>Tanggal Daftar</TableHead>
+              <TableHead className="w-[80px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {comp.registrations.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-6 text-gray-500">Belum ada peserta yang mendaftar.</TableCell>
+                <TableCell colSpan={5} className="text-center py-6 text-gray-500">Belum ada peserta yang mendaftar.</TableCell>
               </TableRow>
             ) : (
               comp.registrations.map(reg => (
@@ -92,6 +95,16 @@ export default async function CompetitionManagePage({
                   <TableCell>{reg.participant.phone}</TableCell>
                   <TableCell>{reg.participant.houseBlock} - {reg.participant.houseNumber}</TableCell>
                   <TableCell>{reg.createdAt.toLocaleDateString("id-ID")}</TableCell>
+                  <TableCell>
+                    <DeleteButton
+                      id={reg.id}
+                      action={deleteRegistrationAction}
+                      confirmMessage={`Apakah Anda yakin ingin menghapus pendaftaran "${reg.participant.name}" dari perlombaan "${comp.name}"? Jika tim/bagan sudah terbentuk, bagan/tim yang bersangkutan akan terpengaruh.`}
+                      size="icon"
+                      variant="ghost"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                    />
+                  </TableCell>
                 </TableRow>
               ))
             )}

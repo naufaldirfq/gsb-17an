@@ -81,3 +81,125 @@ export async function createCompetitionAction(formData: FormData) {
   }
 }
 
+export async function deleteParticipantAction(participantId: string) {
+  const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
+  if (authCookie?.value !== "authenticated") {
+    return { error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Find all registrations for this participant
+      const registrations = await tx.registration.findMany({
+        where: { participantId },
+        include: { teamMember: true },
+      });
+
+      // For each registration, delete the team member if it exists
+      for (const reg of registrations) {
+        if (reg.teamMember) {
+          const teamId = reg.teamMember.teamId;
+
+          // Delete team member
+          await tx.teamMember.delete({
+            where: { id: reg.teamMember.id },
+          });
+
+          // Check if the team now has 0 members
+          const remainingMembers = await tx.teamMember.count({
+            where: { teamId },
+          });
+          if (remainingMembers === 0) {
+            // Delete matches referencing this team
+            await tx.match.deleteMany({
+              where: {
+                OR: [
+                  { teamAId: teamId },
+                  { teamBId: teamId },
+                  { winnerTeamId: teamId },
+                ],
+              },
+            });
+            // Delete team
+            await tx.team.delete({
+              where: { id: teamId },
+            });
+          }
+        }
+      }
+
+      // Delete registrations
+      await tx.registration.deleteMany({
+        where: { participantId },
+      });
+
+      // Finally, delete the participant
+      await tx.participant.delete({
+        where: { id: participantId },
+      });
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Gagal menghapus peserta:", err);
+    return { error: "Gagal menghapus peserta" };
+  }
+}
+
+export async function deleteRegistrationAction(registrationId: string) {
+  const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
+  if (authCookie?.value !== "authenticated") {
+    return { error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Check if registration has a team member
+      const reg = await tx.registration.findUnique({
+        where: { id: registrationId },
+        include: { teamMember: true },
+      });
+
+      if (reg?.teamMember) {
+        const teamId = reg.teamMember.teamId;
+
+        // Delete team member
+        await tx.teamMember.delete({
+          where: { id: reg.teamMember.id },
+        });
+
+        // Check if the team now has 0 members
+        const remainingMembers = await tx.teamMember.count({
+          where: { teamId },
+        });
+        if (remainingMembers === 0) {
+          // Delete matches referencing this team
+          await tx.match.deleteMany({
+            where: {
+              OR: [
+                { teamAId: teamId },
+                { teamBId: teamId },
+                { winnerTeamId: teamId },
+              ],
+            },
+          });
+          // Delete team
+          await tx.team.delete({
+            where: { id: teamId },
+          });
+        }
+      }
+
+      // Delete registration
+      await tx.registration.delete({
+        where: { id: registrationId },
+      });
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Gagal menghapus pendaftaran:", err);
+    return { error: "Gagal menghapus pendaftaran" };
+  }
+}
+
