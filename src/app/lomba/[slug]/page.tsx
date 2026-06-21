@@ -61,6 +61,9 @@ export default async function LombaDetail({
           
           <div className="mt-4">
             <WhatsAppShare competitionName={competition.name} />
+            <a href={`/print/lomba/${competition.slug}`} target="_blank" className="inline-flex items-center justify-center bg-gray-800 hover:bg-gray-900 text-white py-2 px-3 rounded-md text-xs font-semibold transition-colors mt-2">
+              Cetak Detail Lomba 🖨️
+            </a>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mt-4">

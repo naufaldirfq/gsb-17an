@@ -105,3 +105,18 @@
     @apply font-jakarta;
   }
 }
+
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+    font-size: 12pt;
+  }
+  .print-hidden, nav, header, footer, button, a.btn, select, input {
+    display: none !important;
+  }
+  .print-page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+}

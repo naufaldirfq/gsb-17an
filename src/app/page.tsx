@@ -53,10 +53,13 @@ export default async function Home() {
           </Card>
         )}
 
-        <div className="mt-6 w-full mb-12">
+        <div className="mt-6 w-full mb-12 flex flex-col gap-3">
           <Link href="/lomba" className="inline-flex items-center justify-center w-full bg-merah hover:bg-merah-tua text-putih-kertas text-lg py-6 rounded-xl font-bold transition-colors">
             Daftar Lomba
           </Link>
+          <a href="/print/laporan" target="_blank" className="inline-flex items-center justify-center bg-gray-800 hover:bg-gray-900 text-white py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors">
+            Cetak Laporan Event 🖨️
+          </a>
         </div>
       </div>
     </main>
