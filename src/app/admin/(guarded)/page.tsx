@@ -8,6 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AddCompetitionModal } from "./add-competition-modal";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const competitions = await prisma.competition.findMany({
@@ -21,9 +24,12 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-arang">Dashboard Admin</h1>
-        <p className="text-gray-500 mt-2">Ringkasan status perlombaan GSB.</p>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-arang">Dashboard Admin</h1>
+          <p className="text-gray-500 mt-2">Ringkasan status perlombaan GSB.</p>
+        </div>
+        <AddCompetitionModal />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
