@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { ADMIN_AUTH_COOKIE } from "@/lib/constants";
 import { z } from "zod";
 import prisma from "@/lib/prisma";
@@ -280,5 +281,126 @@ export async function deleteCompetitionAction(competitionId: string) {
     return { error: "Gagal menghapus perlombaan" };
   }
 }
+
+export async function editCompetitionAction(competitionId: string, formData: FormData) {
+  const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
+  if (authCookie?.value !== "authenticated") {
+    return { error: "Unauthorized" };
+  }
+
+  const existingComp = await prisma.competition.findUnique({
+    where: { id: competitionId },
+    include: {
+      matches: true,
+      registrations: true,
+    }
+  });
+
+  if (!existingComp) {
+    return { error: "Perlombaan tidak ditemukan" };
+  }
+
+  const hasMatches = existingComp.matches.length > 0;
+
+  const rawName = formData.get("name") as string;
+  const description = formData.get("description") as string || null;
+  const rules = formData.get("rules") as string || null;
+  const heldAt = formData.get("heldAt") as string || null;
+  const location = formData.get("location") as string || null;
+  
+  const maxParticipantsRaw = formData.get("maxParticipants") as string;
+  const maxParticipants = maxParticipantsRaw ? parseInt(maxParticipantsRaw) : null;
+
+  if (maxParticipants !== null && maxParticipants < existingComp.registrations.length) {
+    return { error: `Kuota maksimal tidak boleh kurang dari jumlah pendaftar saat ini (${existingComp.registrations.length})` };
+  }
+
+  // If RACE_HEATS is selected and matches don't exist, validate heatSize
+  if (!hasMatches) {
+    const bracketFormat = formData.get("bracketFormat") as BracketFormat;
+    if (bracketFormat === "RACE_HEATS") {
+      const heatSizeRaw = formData.get("heatSize") as string;
+      const heatSize = (heatSizeRaw && heatSizeRaw.trim() !== "") ? parseInt(heatSizeRaw) : null;
+      if (heatSize === null || heatSize < 2) {
+        return { error: "Jumlah peserta per heat harus diisi untuk format Balap/Renang dan minimal 2" };
+      }
+    }
+  }
+
+  const updateData: {
+    name: string;
+    description: string | null;
+    rules: string | null;
+    heldAt: string | null;
+    location: string | null;
+    maxParticipants: number | null;
+    teamSize?: number;
+    pairingMode?: PairingMode;
+    bracketFormat?: BracketFormat;
+    registrationRequired?: boolean;
+    heatSize?: number | null;
+    slug?: string;
+  } = {
+    name: rawName,
+    description,
+    rules,
+    heldAt,
+    location,
+    maxParticipants,
+    ...(!hasMatches ? {
+      teamSize: parseInt(formData.get("teamSize") as string) || 1,
+      pairingMode: formData.get("pairingMode") as PairingMode,
+      bracketFormat: formData.get("bracketFormat") as BracketFormat,
+      registrationRequired: formData.get("registrationRequired") === "true",
+      heatSize: (formData.get("bracketFormat") as BracketFormat) === "RACE_HEATS"
+        ? (formData.get("heatSize") ? parseInt(formData.get("heatSize") as string) : null)
+        : null,
+    } : {}),
+  };
+
+  // Handle Slug updates if the name changes
+  let redirectUrl = null;
+  if (rawName !== existingComp.name) {
+    let slug = rawName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    if (!slug) {
+      slug = `lomba-${Date.now().toString().slice(-4)}`;
+    } else {
+      const conflicting = await prisma.competition.findFirst({
+        where: {
+          slug,
+          NOT: { id: competitionId }
+        }
+      });
+      if (conflicting) {
+        slug = `${slug}-${Date.now().toString().slice(-4)}`;
+      }
+    }
+    updateData.slug = slug;
+    redirectUrl = `/admin/lomba/${slug}`;
+  }
+
+  try {
+    await prisma.competition.update({
+      where: { id: competitionId },
+      data: updateData,
+    });
+
+    revalidatePath("/admin");
+    if (redirectUrl) {
+      revalidatePath(redirectUrl);
+    } else {
+      revalidatePath(`/admin/lomba/${existingComp.slug}`, "page");
+    }
+    revalidatePath(`/lomba/${existingComp.slug}`, "page");
+    revalidatePath(`/lomba/${existingComp.slug}/bagan`, "page");
+    revalidatePath("/lomba");
+
+    return { success: true, redirectUrl };
+  } catch (err) {
+    console.error(err);
+    return { error: "Gagal memperbarui perlombaan" };
+  }
+}
+
 
 

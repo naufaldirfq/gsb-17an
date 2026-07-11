@@ -18,6 +18,7 @@ import { deleteRegistrationAction } from "@/app/admin/actions";
 import { getStandingsForCompetition } from "./actions";
 import { AddParticipantModal } from "./add-participant-modal";
 import { EditParticipantModal } from "./edit-participant-modal";
+import { EditCompetitionModal } from "./edit-competition-modal";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +103,7 @@ export default async function CompetitionManagePage({
           </p>
         </div>
         <div className="flex gap-4">
+          <EditCompetitionModal competition={comp} hasMatches={comp.matches.length > 0} />
           <RegistrationActions 
             competitionId={comp.id} 
             isRegistration={isRegistration} 
