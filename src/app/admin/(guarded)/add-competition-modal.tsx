@@ -17,6 +17,9 @@ export function AddCompetitionModal() {
   const [pairingMode, setPairingMode] = useState("SOLO");
   const [bracketFormat, setBracketFormat] = useState("SINGLE_ELIM");
   const [heatSize, setHeatSize] = useState("3");
+  const [registrationRequired, setRegistrationRequired] = useState(true);
+  const [heldAt, setHeldAt] = useState("");
+  const [location, setLocation] = useState("");
   const router = useRouter();
 
   const applyPreset = (preset: "solo" | "ganda_acak" | "tim_manual") => {
@@ -40,6 +43,9 @@ export function AddCompetitionModal() {
     formData.set("pairingMode", pairingMode);
     formData.set("bracketFormat", bracketFormat);
     formData.set("heatSize", bracketFormat === "RACE_HEATS" ? heatSize : "");
+    formData.set("registrationRequired", String(registrationRequired));
+    formData.set("heldAt", heldAt);
+    formData.set("location", location);
 
     const res = await createCompetitionAction(formData);
     if (res.error) {
@@ -47,6 +53,9 @@ export function AddCompetitionModal() {
     } else {
       toast.success("Perlombaan berhasil ditambahkan!");
       setOpen(false);
+      setRegistrationRequired(true);
+      setHeldAt("");
+      setLocation("");
       router.refresh();
     }
   };
@@ -81,6 +90,36 @@ export function AddCompetitionModal() {
           <div>
             <Label htmlFor="rules">Peraturan</Label>
             <Textarea id="rules" name="rules" />
+          </div>
+          <div className="flex items-center gap-2 py-1">
+            <input
+              id="registrationRequired"
+              type="checkbox"
+              checked={registrationRequired}
+              onChange={(e) => setRegistrationRequired(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-merah focus:ring-merah cursor-pointer"
+            />
+            <Label htmlFor="registrationRequired" className="cursor-pointer font-semibold">Pendaftaran Diperlukan</Label>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="heldAt">Waktu Pelaksanaan</Label>
+              <Input
+                id="heldAt"
+                value={heldAt}
+                onChange={(e) => setHeldAt(e.target.value)}
+                placeholder="Contoh: Sabtu, 17 Agt, 09:00"
+              />
+            </div>
+            <div>
+              <Label htmlFor="location">Lokasi</Label>
+              <Input
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Contoh: Lapangan Blok C"
+              />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
