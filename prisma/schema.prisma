@@ -23,6 +23,10 @@ model Competition {
   status           CompetitionStatus @default(REGISTRATION)
   createdAt        DateTime          @default(now())
 
+  registrationRequired Boolean           @default(true)
+  heldAt               String?
+  location             String?
+
   registrations Registration[]
   teams         Team[]
   matches       Match[]
