@@ -56,6 +56,9 @@ export default async function Home() {
           <Link href="/lomba" className="inline-flex items-center justify-center w-full bg-merah hover:bg-merah-tua text-putih-kertas text-lg py-6 rounded-xl font-bold transition-colors">
             Daftar Lomba
           </Link>
+          <Link href="/juara" className="inline-flex items-center justify-center w-full bg-surface border border-emas text-emas hover:bg-emas/5 text-lg py-6 rounded-xl font-bold transition-colors shadow-sm">
+            🏆 Galeri Juara
+          </Link>
         </div>
       </div>
     </main>

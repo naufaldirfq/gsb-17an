@@ -49,7 +49,12 @@ export async function openRegistrationAction(competitionId: string) {
   }
 }
 
-export async function generateBracketAction(competitionId: string) {
+export async function generateBracketAction(
+  competitionId: string,
+  leftoverResolution?: {
+    action: "MERGE" | "ADD_PANITIA";
+  }
+) {
   try {
     await verifyAuth();
     
@@ -70,65 +75,144 @@ export async function generateBracketAction(competitionId: string) {
       return { error: "Pendaftaran harus ditutup terlebih dahulu sebelum membuat bagan." };
     }
 
-    // 1. Shuffle participants
+    // Check if any match is already completed
+    const completedMatchesCount = await prisma.match.count({
+      where: {
+        competitionId,
+        status: "COMPLETED",
+      },
+    });
+    if (completedMatchesCount > 0) {
+      return { error: "Bagan tidak dapat diubah/diacak karena sudah ada pertandingan yang selesai." };
+    }
+
+    // Check for leftovers
     const regs = [...comp.registrations];
+    const teamSize = comp.teamSize;
+    const remainder = regs.length % teamSize;
+
+    if (remainder !== 0 && !leftoverResolution) {
+      const leftovers = regs.slice(regs.length - remainder).map(r => r.participant.name);
+      return {
+        error: "LEFTOVERS_DETECTED",
+        leftovers
+      };
+    }
+
+    // 1. Shuffle participants
     for (let i = regs.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [regs[i], regs[j]] = [regs[j], regs[i]];
     }
 
-    // 2. Group into teams
-    const teamSize = comp.teamSize;
-    const numTeamsToForm = Math.floor(regs.length / teamSize);
-    
-    if (numTeamsToForm === 0) {
-      return { error: "Not enough participants to form even one team." };
-    }
-
-    // Prepare teams and team members
-    type TeamMemberInput = { id: string; teamId: string; registrationId: string };
-    type TeamInput = { id: string; competitionId: string; name: string; members: TeamMemberInput[] };
-    const newTeams: TeamInput[] = [];
-    let regIndex = 0;
-    
-    for (let i = 0; i < numTeamsToForm; i++) {
-      const teamId = crypto.randomUUID();
-      const members = [];
-      const memberNames: string[] = [];
-
-      for (let j = 0; j < teamSize; j++) {
-        const reg = regs[regIndex];
-        members.push({
-          id: crypto.randomUUID(),
-          teamId: teamId,
-          registrationId: reg.id
-        });
-
-        const part = reg.participant;
-        const houseInfo = part.houseBlock && part.houseNumber
-          ? `${part.houseBlock}-${part.houseNumber}`
-          : (part.houseBlock || part.houseNumber || "");
-
-        const formattedName = houseInfo
-          ? `${part.name} ${houseInfo}`
-          : part.name;
-
-        memberNames.push(formattedName);
-        regIndex++;
-      }
-      
-      const teamName = memberNames.join(" X ");
-      
-      newTeams.push({
-        id: teamId,
-        competitionId: comp.id,
-        name: teamName,
-        members
-      });
-    }
-
     // Use Prisma transaction to insert all
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
+      // If resolving via ADD_PANITIA, create dummy registrations first
+      if (remainder !== 0 && leftoverResolution?.action === "ADD_PANITIA") {
+        const needed = teamSize - remainder;
+        for (let i = 0; i < needed; i++) {
+          const dummyPhone = `08-PANITIA-${crypto.randomUUID().slice(0, 8)}`;
+          const dummyName = `Panitia Penyelamat ${i + 1}`;
+          
+          const part = await tx.participant.create({
+            data: {
+              name: dummyName,
+              phone: dummyPhone,
+              houseBlock: "P",
+              houseNumber: "0",
+            }
+          });
+          
+          const reg = await tx.registration.create({
+            data: {
+              competitionId,
+              participantId: part.id,
+            },
+            include: {
+              participant: true,
+            }
+          });
+          
+          regs.push(reg);
+        }
+      }
+
+      // Group into teams
+      const numTeamsToForm = Math.floor(regs.length / teamSize);
+      if (numTeamsToForm === 0) {
+        throw new Error("Not enough participants to form even one team.");
+      }
+
+      // Prepare teams and team members
+      type TeamMemberInput = { id: string; teamId: string; registrationId: string; name: string };
+      type TeamInput = { id: string; competitionId: string; name: string; members: TeamMemberInput[] };
+      const newTeams: TeamInput[] = [];
+      let regIndex = 0;
+      
+      for (let i = 0; i < numTeamsToForm; i++) {
+        const teamId = crypto.randomUUID();
+        const members = [];
+        const memberNames: string[] = [];
+
+        for (let j = 0; j < teamSize; j++) {
+          const reg = regs[regIndex];
+          const part = reg.participant;
+          const houseInfo = part.houseBlock && part.houseNumber
+            ? `${part.houseBlock}-${part.houseNumber}`
+            : (part.houseBlock || part.houseNumber || "");
+
+          const formattedName = houseInfo
+            ? `${part.name} ${houseInfo}`
+            : part.name;
+
+          members.push({
+            id: crypto.randomUUID(),
+            teamId: teamId,
+            registrationId: reg.id,
+            name: formattedName
+          });
+
+          memberNames.push(formattedName);
+          regIndex++;
+        }
+        
+        const teamName = memberNames.join(" X ");
+        
+        newTeams.push({
+          id: teamId,
+          competitionId: comp.id,
+          name: teamName,
+          members
+        });
+      }
+
+      // If resolving via MERGE, distribute remaining leftovers into formed teams
+      if (remainder !== 0 && leftoverResolution?.action === "MERGE") {
+        for (let i = regIndex; i < regs.length; i++) {
+          const reg = regs[i];
+          const part = reg.participant;
+          const houseInfo = part.houseBlock && part.houseNumber
+            ? `${part.houseBlock}-${part.houseNumber}`
+            : (part.houseBlock || part.houseNumber || "");
+
+          const formattedName = houseInfo
+            ? `${part.name} ${houseInfo}`
+            : part.name;
+
+          // Pick a random team to merge into
+          const randomTeamIndex = Math.floor(Math.random() * numTeamsToForm);
+          const targetTeam = newTeams[randomTeamIndex];
+          
+          targetTeam.members.push({
+            id: crypto.randomUUID(),
+            teamId: targetTeam.id,
+            registrationId: reg.id,
+            name: formattedName
+          });
+          
+          targetTeam.name = `${targetTeam.name} X ${formattedName}`;
+        }
+      }
       // Clear existing teams and matches just in case
       await tx.match.deleteMany({ where: { competitionId } });
       await tx.teamMember.deleteMany({ where: { team: { competitionId } } });

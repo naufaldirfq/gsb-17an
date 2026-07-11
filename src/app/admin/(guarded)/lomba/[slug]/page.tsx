@@ -43,7 +43,8 @@ export default async function CompetitionManagePage({
         include: {
           teamA: true,
           teamB: true,
-          winnerTeam: true
+          winnerTeam: true,
+          nextMatch: true
         }
       }
     }
@@ -53,6 +54,7 @@ export default async function CompetitionManagePage({
 
   const isRegistration = comp.status === "REGISTRATION";
   const isOngoing = comp.status === "ONGOING" || comp.status === "DONE";
+  const hasCompletedMatches = comp.matches.some(m => m.status === "COMPLETED");
 
   return (
     <div className="space-y-6">
@@ -65,7 +67,7 @@ export default async function CompetitionManagePage({
         </div>
         <div className="flex gap-4">
           <RegistrationActions competitionId={comp.id} isRegistration={isRegistration} />
-          <BracketActions competitionId={comp.id} status={comp.status} />
+          <BracketActions competitionId={comp.id} status={comp.status} hasCompletedMatches={hasCompletedMatches} />
         </div>
       </div>
 

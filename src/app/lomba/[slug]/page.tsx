@@ -70,11 +70,9 @@ export default async function LombaDetail({
             <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
               {competition.teamSize === 1 ? "Perorangan" : `${competition.teamSize} Orang/Tim`}
             </span>
-            {competition.maxParticipants && (
-              <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
-                {competition._count.registrations} / {competition.maxParticipants} Kuota
-              </span>
-            )}
+            <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
+              Terdaftar: {competition._count.registrations} Orang
+            </span>
           </div>
         </div>
 

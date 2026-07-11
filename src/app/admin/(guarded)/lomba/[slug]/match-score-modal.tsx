@@ -10,7 +10,6 @@ import { submitScoreAction } from "./actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-
 type MatchData = {
   id: string;
   teamAId: string | null;
@@ -21,6 +20,7 @@ type MatchData = {
   scoreB: number | null;
   winnerTeamId: string | null;
   status: string;
+  nextMatch?: { id: string; status: string } | null;
 };
 
 export function MatchScoreModal({ match }: { match: MatchData }) {
@@ -36,8 +36,11 @@ export function MatchScoreModal({ match }: { match: MatchData }) {
     return <span className="text-gray-400 text-sm">Waiting for teams</span>;
   }
 
-  if (match.status === "COMPLETED") {
-    return <span className="text-gray-500 text-sm">Completed</span>;
+  const isCompleted = match.status === "COMPLETED";
+  const isNextMatchCompleted = match.nextMatch?.status === "COMPLETED";
+
+  if (isNextMatchCompleted) {
+    return <span className="text-gray-500 text-xs font-semibold bg-gray-100 py-1 px-2.5 rounded border border-gray-200">Skor Terkunci 🔒</span>;
   }
 
   const handleScoreChange = (side: "A" | "B", val: string) => {
@@ -83,12 +86,12 @@ export function MatchScoreModal({ match }: { match: MatchData }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-merah bg-transparent shadow-sm hover:bg-merah/10 hover:text-merah text-merah h-8 px-3">
-        Update Score
+      <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-merah bg-transparent shadow-sm hover:bg-merah/10 hover:text-merah text-merah h-8 px-3 cursor-pointer">
+        {isCompleted ? "Ubah Skor ✏️" : "Update Score"}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update Match Score</DialogTitle>
+          <DialogTitle>{isCompleted ? "Ubah Skor Pertandingan" : "Update Match Score"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="grid grid-cols-2 gap-4">
@@ -123,7 +126,7 @@ export function MatchScoreModal({ match }: { match: MatchData }) {
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" disabled={isSubmitting} className="w-full bg-merah hover:bg-merah-tua text-white">
+          <Button type="submit" disabled={isSubmitting} className="w-full bg-merah hover:bg-merah-tua text-white font-bold cursor-pointer">
             {isSubmitting ? "Saving..." : "Save Score"}
           </Button>
         </form>

@@ -3,9 +3,40 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { registerSchema } from "@/lib/validations";
+import { headers } from "next/headers";
+
+const ipCache = new Map<string, number[]>();
+const LIMIT_WINDOW = 60 * 1000; // 1 minute
+const LIMIT_MAX = 5; // 5 registrations per minute
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = ipCache.get(ip) || [];
+  const activeTimestamps = timestamps.filter(t => now - t < LIMIT_WINDOW);
+  
+  if (activeTimestamps.length >= LIMIT_MAX) {
+    return true;
+  }
+  
+  activeTimestamps.push(now);
+  ipCache.set(ip, activeTimestamps);
+  return false;
+}
+
+export async function resetRateLimitCacheForTesting() {
+  ipCache.clear();
+}
 
 export async function registerAction(prevState: unknown, formData: FormData) {
   try {
+    const reqHeaders = await headers();
+    const forwardedFor = reqHeaders.get("x-forwarded-for");
+    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
+
+    if (isRateLimited(ip)) {
+      return { error: true, message: "Terlalu banyak permintaan pendaftaran. Silakan coba sesaat lagi." };
+    }
+
     const rawData = {
       competitionId: formData.get("competitionId") as string,
       name: formData.get("name") as string,

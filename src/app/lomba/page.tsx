@@ -41,7 +41,7 @@ export default async function LombaList() {
                       {comp.teamSize === 1 ? "Perorangan" : `${comp.teamSize} Orang`}
                     </span>
                     <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
-                      Kuota: {comp._count.registrations}/{comp.maxParticipants || '∞'}
+                      Terdaftar: {comp._count.registrations} Orang
                     </span>
                   </div>
                 </CardHeader>
