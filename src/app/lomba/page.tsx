@@ -28,9 +28,10 @@ export default async function LombaList() {
 
         <div className="flex flex-col gap-4">
           {competitions.map((comp) => {
+            const registrationRequired = comp.registrationRequired ?? true;
             const isFull = comp.maxParticipants && comp._count.registrations >= comp.maxParticipants;
             const isOpen = comp.registrationOpen && comp.status === "REGISTRATION";
-            const canRegister = isOpen && !isFull && comp.registrationRequired;
+            const canRegister = isOpen && !isFull && registrationRequired;
 
             return (
               <Card key={comp.id} className="border-border">
@@ -40,7 +41,7 @@ export default async function LombaList() {
                     <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
                       {comp.teamSize === 1 ? "Perorangan" : `${comp.teamSize} Orang`}
                     </span>
-                    {comp.registrationRequired && (
+                    {registrationRequired && (
                       <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
                         Terdaftar: {comp._count.registrations} Orang
                       </span>
@@ -51,7 +52,7 @@ export default async function LombaList() {
                   {comp.description && (
                     <p className="text-sm text-arang/80 line-clamp-2">{comp.description}</p>
                   )}
-                  {!comp.registrationRequired ? (
+                  {!registrationRequired ? (
                     <Link href={`/lomba/${comp.slug}`} className="w-full inline-block text-center bg-gray-800 hover:bg-gray-900 text-putih-kertas py-3 rounded-[12px] font-bold transition-colors">
                       Lihat Informasi
                     </Link>

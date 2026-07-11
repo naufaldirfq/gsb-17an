@@ -52,9 +52,10 @@ export default async function LombaDetail({
     notFound();
   }
 
+  const registrationRequired = competition.registrationRequired ?? true;
   const isFull = competition.maxParticipants && competition._count.registrations >= competition.maxParticipants;
   const isOpen = competition.registrationOpen && competition.status === "REGISTRATION";
-  const canRegister = isOpen && !isFull;
+  const canRegister = isOpen && !isFull && registrationRequired;
 
   const isGroupKnockout = competition.bracketFormat === "GROUP_KNOCKOUT";
   const isRoundRobin = competition.bracketFormat === "ROUND_ROBIN";
@@ -87,7 +88,7 @@ export default async function LombaDetail({
             <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
               {competition.teamSize === 1 ? "Perorangan" : `${competition.teamSize} Orang/Tim`}
             </span>
-            {competition.registrationRequired && (
+            {registrationRequired && (
               <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
                 Terdaftar: {competition._count.registrations} Orang
               </span>
@@ -117,7 +118,7 @@ export default async function LombaDetail({
           </Card>
         )}
 
-        {(competition.heldAt || competition.location || !competition.registrationRequired) && (
+        {(competition.heldAt || competition.location || !registrationRequired) && (
           <Card className="border-border">
             <CardHeader className="pb-2">
               <CardTitle className="font-anton text-xl text-arang tracking-tight">Informasi Pelaksanaan</CardTitle>
@@ -142,7 +143,7 @@ export default async function LombaDetail({
           </Card>
         )}
 
-        {competition.registrationRequired && (
+        {registrationRequired && (
           <Card className="border-border">
             <CardHeader className="pb-2">
               <CardTitle className="font-anton text-2xl text-arang tracking-tight">Pendaftaran</CardTitle>
@@ -391,7 +392,7 @@ export default async function LombaDetail({
           </CardContent>
         </Card>
 
-        {competition.registrationRequired && (
+        {registrationRequired && (
           <Card className="border-border">
             <CardHeader className="pb-2">
               <CardTitle className="font-anton text-xl text-arang tracking-tight">Daftar Peserta ({competition._count.registrations})</CardTitle>
