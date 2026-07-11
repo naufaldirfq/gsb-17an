@@ -12,6 +12,7 @@ import { AddCompetitionModal } from "./add-competition-modal";
 import { Printer } from "lucide-react";
 import { DeleteButton } from "./delete-button";
 import { deleteCompetitionAction } from "../actions";
+import { AnnouncementToggle } from "./announcement-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,11 @@ export default async function AdminDashboardPage() {
     },
     orderBy: { createdAt: "asc" },
   });
+
+  const setting = await prisma.setting.findUnique({
+    where: { key: "showLineupAnnouncement" },
+  });
+  const showLineupAnnouncement = setting ? setting.value === "true" : true;
 
   return (
     <div className="space-y-6">
@@ -43,6 +49,10 @@ export default async function AdminDashboardPage() {
           </a>
           <AddCompetitionModal />
         </div>
+      </div>
+
+      <div className="max-w-xl">
+        <AnnouncementToggle initialShow={showLineupAnnouncement} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
