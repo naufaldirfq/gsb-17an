@@ -16,6 +16,8 @@ import { MatchScheduleModal } from "./match-schedule-modal";
 import { DeleteButton } from "@/app/admin/(guarded)/delete-button";
 import { deleteRegistrationAction } from "@/app/admin/actions";
 import { getStandingsForCompetition } from "./actions";
+import { AddParticipantModal } from "./add-participant-modal";
+import { EditParticipantModal } from "./edit-participant-modal";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +83,15 @@ export default async function CompetitionManagePage({
     ? await getStandingsForCompetition(comp.id)
     : null;
 
+  const existingParticipants = await prisma.participant.findMany({
+    where: {
+      registrations: {
+        none: { competitionId: comp.id }
+      }
+    },
+    orderBy: { name: 'asc' }
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-4">
@@ -108,8 +119,9 @@ export default async function CompetitionManagePage({
       </div>
 
       <div className="bg-white rounded-lg shadow border border-gray-200">
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-arang">Daftar Pendaftar ({comp.registrations.length})</h2>
+          <AddParticipantModal competitionId={comp.id} existingParticipants={existingParticipants} />
         </div>
         <Table>
           <TableHeader>
@@ -134,14 +146,17 @@ export default async function CompetitionManagePage({
                   <TableCell>{reg.participant.houseBlock} - {reg.participant.houseNumber}</TableCell>
                   <TableCell>{reg.createdAt.toLocaleDateString("id-ID")}</TableCell>
                   <TableCell>
-                    <DeleteButton
-                      id={reg.id}
-                      action={deleteRegistrationAction}
-                      confirmMessage={`Apakah Anda yakin ingin menghapus pendaftaran "${reg.participant.name}" dari perlombaan "${comp.name}"? Jika tim/bagan sudah terbentuk, bagan/tim yang bersangkutan akan terpengaruh.`}
-                      size="icon"
-                      variant="ghost"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
-                    />
+                    <div className="flex items-center gap-1">
+                      <EditParticipantModal participant={reg.participant} />
+                      <DeleteButton
+                        id={reg.id}
+                        action={deleteRegistrationAction}
+                        confirmMessage={`Apakah Anda yakin ingin menghapus pendaftaran "${reg.participant.name}" dari perlombaan "${comp.name}"? Jika tim/bagan sudah terbentuk, bagan/tim yang bersangkutan akan terpengaruh.`}
+                        size="icon"
+                        variant="ghost"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

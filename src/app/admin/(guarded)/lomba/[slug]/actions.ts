@@ -6,6 +6,8 @@ import { cookies } from "next/headers";
 import { ADMIN_AUTH_COOKIE } from "@/lib/constants";
 import { MatchStatus, Slot } from "@prisma/client";
 import { generateHeatsStructure } from "@/lib/tournament-utils";
+import { z } from "zod";
+import { registerSchema } from "@/lib/validations";
 
 async function verifyAuth() {
   const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
@@ -1216,3 +1218,228 @@ export async function saveMatchRankingsAction(
     return { error: message };
   }
 }
+
+const editParticipantSchema = z.object({
+  name: z.string().min(2, "Nama minimal 2 karakter"),
+  houseBlock: z.string().min(1, "Blok rumah wajib diisi"),
+  houseNumber: z.string().min(1, "Nomor rumah wajib diisi"),
+  phone: z.string()
+    .regex(/^(?:\+62|08)[0-9]{7,13}$/, "Nomor HP harus diawali dengan 08 atau +62")
+    .transform((val) => {
+      if (val.startsWith("+62")) {
+        return "0" + val.slice(3);
+      }
+      return val;
+    }),
+});
+
+export async function addParticipantToCompetitionAction(
+  competitionId: string,
+  formData: FormData
+) {
+  try {
+    await verifyAuth();
+
+    const rawData = {
+      competitionId,
+      name: formData.get("name") as string,
+      phone: formData.get("phone") as string,
+      houseBlock: formData.get("houseBlock") as string,
+      houseNumber: formData.get("houseNumber") as string,
+    };
+
+    const validated = registerSchema.safeParse(rawData);
+    if (!validated.success) {
+      return { error: validated.error.issues[0].message };
+    }
+
+    const { name, phone, houseBlock, houseNumber } = validated.data;
+
+    // Check capacity
+    const comp = await prisma.competition.findUnique({
+      where: { id: competitionId },
+      include: {
+        _count: {
+          select: { registrations: true },
+        },
+      },
+    });
+
+    if (!comp) {
+      return { error: "Lomba tidak ditemukan." };
+    }
+
+    if (comp.maxParticipants && comp._count.registrations >= comp.maxParticipants) {
+      return { error: "Kuota pendaftaran sudah penuh." };
+    }
+
+    // Upsert participant by name and phone
+    const participant = await prisma.participant.upsert({
+      where: {
+        name_phone: {
+          name,
+          phone,
+        },
+      },
+      update: {
+        houseBlock,
+        houseNumber,
+      },
+      create: {
+        name,
+        phone,
+        houseBlock,
+        houseNumber,
+      },
+    });
+
+    // Check existing registration
+    const existingRegistration = await prisma.registration.findUnique({
+      where: {
+        competitionId_participantId: {
+          competitionId,
+          participantId: participant.id,
+        },
+      },
+    });
+
+    if (existingRegistration) {
+      return { error: "Peserta sudah terdaftar di perlombaan ini." };
+    }
+
+    // Create registration
+    await prisma.registration.create({
+      data: {
+        competitionId,
+        participantId: participant.id,
+      },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath(`/admin/lomba/[slug]`, "page");
+    revalidatePath(`/lomba/[slug]`, "page");
+    revalidatePath("/lomba");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to add participant:", error);
+    return { error: "Gagal menambahkan peserta." };
+  }
+}
+
+export async function editParticipantAction(
+  participantId: string,
+  formData: FormData
+) {
+  try {
+    await verifyAuth();
+
+    const rawData = {
+      name: formData.get("name") as string,
+      phone: formData.get("phone") as string,
+      houseBlock: formData.get("houseBlock") as string,
+      houseNumber: formData.get("houseNumber") as string,
+    };
+
+    const validated = editParticipantSchema.safeParse(rawData);
+    if (!validated.success) {
+      return { error: validated.error.issues[0].message };
+    }
+
+    const { name, phone, houseBlock, houseNumber } = validated.data;
+
+    // Check conflict
+    const existing = await prisma.participant.findFirst({
+      where: {
+        name,
+        phone,
+        NOT: { id: participantId },
+      },
+    });
+
+    if (existing) {
+      return { error: "Nama dan nomor WhatsApp tersebut sudah digunakan oleh peserta lain." };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Update the participant
+      await tx.participant.update({
+        where: { id: participantId },
+        data: {
+          name,
+          phone,
+          houseBlock,
+          houseNumber,
+        },
+      });
+
+      // 2. Re-sync all team names referencing this participant
+      const teamMembers = await tx.teamMember.findMany({
+        where: {
+          registration: {
+            participantId: participantId,
+          },
+        },
+        include: {
+          team: {
+            include: {
+              members: {
+                include: {
+                  registration: {
+                    include: {
+                      participant: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      for (const member of teamMembers) {
+        const team = member.team;
+        
+        const allTeamMembers = await tx.teamMember.findMany({
+          where: { teamId: team.id },
+          include: {
+            registration: {
+              include: {
+                participant: true,
+              },
+            },
+          },
+        });
+
+        const memberNames = allTeamMembers.map((tm) => {
+          const part = tm.registration.participantId === participantId 
+            ? { name, houseBlock, houseNumber } 
+            : tm.registration.participant;
+            
+          const houseInfo = part.houseBlock && part.houseNumber
+            ? `${part.houseBlock}-${part.houseNumber}`
+            : (part.houseBlock || part.houseNumber || "");
+
+          return houseInfo ? `${part.name} ${houseInfo}` : part.name;
+        });
+
+        const newTeamName = memberNames.join(" X ");
+        await tx.team.update({
+          where: { id: team.id },
+          data: { name: newTeamName },
+        });
+      }
+    });
+
+    revalidatePath("/admin");
+    revalidatePath(`/admin/lomba/[slug]`, "page");
+    revalidatePath(`/lomba/[slug]`, "page");
+    revalidatePath("/lomba");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to edit participant:", error);
+    return { error: "Gagal mengubah detail peserta." };
+  }
+}
+
