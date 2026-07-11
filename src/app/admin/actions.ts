@@ -203,3 +203,60 @@ export async function deleteRegistrationAction(registrationId: string) {
   }
 }
 
+export async function deleteCompetitionAction(competitionId: string) {
+  const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
+  if (authCookie?.value !== "authenticated") {
+    return { error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // 1. Break self-referential relationships on Matches in this competition
+      await tx.match.updateMany({
+        where: { competitionId },
+        data: { nextMatchId: null },
+      });
+
+      // 2. Delete matches
+      await tx.match.deleteMany({
+        where: { competitionId },
+      });
+
+      // 3. Delete TeamMembers for teams in this competition
+      await tx.teamMember.deleteMany({
+        where: {
+          team: {
+            competitionId,
+          },
+        },
+      });
+
+      // 4. Delete Teams
+      await tx.team.deleteMany({
+        where: { competitionId },
+      });
+
+      // 5. Delete Registrations
+      await tx.registration.deleteMany({
+        where: { competitionId },
+      });
+
+      // 6. Delete Photos
+      await tx.photo.deleteMany({
+        where: { competitionId },
+      });
+
+      // 7. Delete the Competition itself
+      await tx.competition.delete({
+        where: { id: competitionId },
+      });
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Gagal menghapus perlombaan:", err);
+    return { error: "Gagal menghapus perlombaan" };
+  }
+}
+
+
