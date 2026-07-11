@@ -30,6 +30,15 @@ const createCompetitionSchema = z.object({
   pairingMode: z.nativeEnum(PairingMode),
   bracketFormat: z.nativeEnum(BracketFormat),
   maxParticipants: z.number().int().optional().nullable(),
+  heatSize: z.coerce.number().min(2).optional().nullable(),
+}).refine(data => {
+  if (data.bracketFormat === "RACE_HEATS") {
+    return data.heatSize !== null && data.heatSize !== undefined;
+  }
+  return true;
+}, {
+  message: "Jumlah peserta per heat harus diisi untuk format Balap/Renang dan minimal 2",
+  path: ["heatSize"]
 });
 
 export async function createCompetitionAction(formData: FormData) {
@@ -41,6 +50,8 @@ export async function createCompetitionAction(formData: FormData) {
   const rawName = formData.get("name") as string;
   const teamSize = parseInt(formData.get("teamSize") as string) || 1;
   const maxParticipantsRaw = formData.get("maxParticipants") as string;
+  const heatSizeRaw = formData.get("heatSize") as string;
+  const heatSize = (heatSizeRaw && heatSizeRaw.trim() !== "") ? parseInt(heatSizeRaw) : null;
   
   const parsed = createCompetitionSchema.safeParse({
     name: rawName,
@@ -50,6 +61,7 @@ export async function createCompetitionAction(formData: FormData) {
     pairingMode: formData.get("pairingMode"),
     bracketFormat: formData.get("bracketFormat"),
     maxParticipants: maxParticipantsRaw ? parseInt(maxParticipantsRaw) : null,
+    heatSize,
   });
 
   if (!parsed.success) {

@@ -45,7 +45,17 @@ export default async function CompetitionManagePage({
           teamA: true,
           teamB: true,
           winnerTeam: true,
-          nextMatch: true
+          nextMatch: true,
+          matchTeams: {
+            include: {
+              team: true
+            }
+          },
+          competition: {
+            select: {
+              bracketFormat: true
+            }
+          }
         }
       }
     }
@@ -240,42 +250,75 @@ export default async function CompetitionManagePage({
                     <TableHead>Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
-                  {groupMatches.map(match => (
-                    <TableRow key={match.id}>
-                      <TableCell><Badge variant="secondary">{match.label}</Badge></TableCell>
-                      <TableCell>Ronde {match.round}</TableCell>
-                      <TableCell>{match.teamA?.name || "-"}</TableCell>
-                      <TableCell>{match.teamB?.name || "-"}</TableCell>
-                      <TableCell>
-                        <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
-                          {match.status}
-                        </Badge>
-                        {match.winnerTeam && <span className="ml-2 text-sm text-green-600 font-semibold">Pemenang: {match.winnerTeam.name}</span>}
-                      </TableCell>
-                      <TableCell>
-                        {match.court || match.scheduledAt ? (
-                          <div className="text-xs">
-                            <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
-                            <p className="text-gray-500">
-                              {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {match.status !== "BYE" && (
-                          <div className="flex gap-2">
-                            <MatchScheduleModal match={match} />
-                            <MatchScoreModal match={match} />
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
+                 <TableBody>
+                   {groupMatches.map(match => {
+                     const matchIsCustom = match.competition?.bracketFormat === "RACE_HEATS" || match.competition?.bracketFormat === "LEADERBOARD";
+                     return (
+                       <TableRow key={match.id}>
+                         <TableCell><Badge variant="secondary">{match.label}</Badge></TableCell>
+                         <TableCell>Ronde {match.round}</TableCell>
+                         {matchIsCustom ? (
+                           <TableCell colSpan={2}>
+                             <div className="font-semibold text-arang">Peserta:</div>
+                             <div className="text-sm text-gray-600">
+                               {match.matchTeams?.map(mt => mt.team.name).join(", ") || "Belum ada tim"}
+                             </div>
+                           </TableCell>
+                         ) : (
+                           <>
+                             <TableCell>{match.teamA?.name || "-"}</TableCell>
+                             <TableCell>{match.teamB?.name || "-"}</TableCell>
+                           </>
+                         )}
+                         <TableCell>
+                           <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
+                             {match.status}
+                           </Badge>
+                           {matchIsCustom ? (
+                             match.status === "COMPLETED" && (
+                               <div className="mt-1 text-xs space-y-0.5">
+                                 {match.matchTeams
+                                   ?.filter((mt) => mt.rank !== null)
+                                   .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+                                   .map((mt) => (
+                                     <div key={mt.id} className="text-green-600 font-semibold">
+                                       Juara {mt.rank}: {mt.team.name}
+                                     </div>
+                                   ))}
+                               </div>
+                             )
+                           ) : (
+                             match.winnerTeam && (
+                               <span className="ml-2 text-sm text-green-600 font-semibold">
+                                 Pemenang: {match.winnerTeam.name}
+                               </span>
+                             )
+                           )}
+                         </TableCell>
+                         <TableCell>
+                           {match.court || match.scheduledAt ? (
+                             <div className="text-xs">
+                               <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
+                               <p className="text-gray-500">
+                                 {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                               </p>
+                             </div>
+                           ) : (
+                             <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
+                           )}
+                         </TableCell>
+                         <TableCell>
+                           {match.status !== "BYE" && (
+                             <div className="flex gap-2">
+                               <MatchScheduleModal match={match} />
+                               <MatchScoreModal match={match} />
+                             </div>
+                           )}
+                         </TableCell>
+                       </TableRow>
+                     );
+                   })}
+                 </TableBody>
               </Table>
             </div>
           )}
@@ -298,102 +341,168 @@ export default async function CompetitionManagePage({
                     <TableHead>Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
-                  {comp.matches.map(match => (
-                    <TableRow key={match.id}>
-                      <TableCell>{match.label || `Ronde ${match.round}`}</TableCell>
-                      <TableCell>Match {match.position + 1}</TableCell>
-                      <TableCell>{match.teamA?.name || "-"}</TableCell>
-                      <TableCell>{match.teamB?.name || "-"}</TableCell>
-                      <TableCell>
-                        <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
-                          {match.status}
-                        </Badge>
-                        {match.winnerTeam && <span className="ml-2 text-sm text-green-600 font-semibold">Pemenang: {match.winnerTeam.name}</span>}
-                      </TableCell>
-                      <TableCell>
-                        {match.court || match.scheduledAt ? (
-                          <div className="text-xs">
-                            <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
-                            <p className="text-gray-500">
-                              {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {match.status !== "BYE" && (
-                          <div className="flex gap-2">
-                            <MatchScheduleModal match={match} />
-                            <MatchScoreModal match={match} />
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            isGroupKnockout && hasKnockoutMatches && (
-              <div className="bg-white rounded-lg shadow border border-gray-200">
-                <div className="p-4 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold text-arang">Daftar Pertandingan Babak Gugur</h2>
-                </div>
-                <Table>
-                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Ronde</TableHead>
-                      <TableHead>Posisi</TableHead>
-                      <TableHead>Tim A</TableHead>
-                      <TableHead>Tim B</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Jadwal</TableHead>
-                      <TableHead>Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {knockoutMatches.map(match => (
-                      <TableRow key={match.id}>
-                        <TableCell>{match.label || `Ronde ${match.round}`}</TableCell>
-                        <TableCell>Match {match.position + 1}</TableCell>
-                        <TableCell>{match.teamA?.name || "-"}</TableCell>
-                        <TableCell>{match.teamB?.name || "-"}</TableCell>
-                        <TableCell>
-                          <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
-                            {match.status}
-                          </Badge>
-                          {match.winnerTeam && <span className="ml-2 text-sm text-green-600 font-semibold">Pemenang: {match.winnerTeam.name}</span>}
-                        </TableCell>
-                        <TableCell>
-                          {match.court || match.scheduledAt ? (
-                            <div className="text-xs">
-                              <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
-                              <p className="text-gray-500">
-                                {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
-                              </p>
-                            </div>
-                          ) : (
-                            <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {match.status !== "BYE" && (
-                            <div className="flex gap-2">
-                              <MatchScheduleModal match={match} />
-                              <MatchScoreModal match={match} />
-                            </div>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )
-          )}
+                 <TableBody>
+                   {comp.matches.map(match => {
+                     const matchIsCustom = match.competition?.bracketFormat === "RACE_HEATS" || match.competition?.bracketFormat === "LEADERBOARD";
+                     return (
+                       <TableRow key={match.id}>
+                         <TableCell>{match.label || `Ronde ${match.round}`}</TableCell>
+                         <TableCell>Match {match.position + 1}</TableCell>
+                         {matchIsCustom ? (
+                           <TableCell colSpan={2}>
+                             <div className="font-semibold text-arang">Peserta:</div>
+                             <div className="text-sm text-gray-600">
+                               {match.matchTeams?.map(mt => mt.team.name).join(", ") || "Belum ada tim"}
+                             </div>
+                           </TableCell>
+                         ) : (
+                           <>
+                             <TableCell>{match.teamA?.name || "-"}</TableCell>
+                             <TableCell>{match.teamB?.name || "-"}</TableCell>
+                           </>
+                         )}
+                         <TableCell>
+                           <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
+                             {match.status}
+                           </Badge>
+                           {matchIsCustom ? (
+                             match.status === "COMPLETED" && (
+                               <div className="mt-1 text-xs space-y-0.5">
+                                 {match.matchTeams
+                                   ?.filter((mt) => mt.rank !== null)
+                                   .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+                                   .map((mt) => (
+                                     <div key={mt.id} className="text-green-600 font-semibold">
+                                       Juara {mt.rank}: {mt.team.name}
+                                     </div>
+                                   ))}
+                               </div>
+                             )
+                           ) : (
+                             match.winnerTeam && (
+                               <span className="ml-2 text-sm text-green-600 font-semibold">
+                                 Pemenang: {match.winnerTeam.name}
+                               </span>
+                             )
+                           )}
+                         </TableCell>
+                         <TableCell>
+                           {match.court || match.scheduledAt ? (
+                             <div className="text-xs">
+                               <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
+                               <p className="text-gray-500">
+                                 {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                               </p>
+                             </div>
+                           ) : (
+                             <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
+                           )}
+                         </TableCell>
+                         <TableCell>
+                           {match.status !== "BYE" && (
+                             <div className="flex gap-2">
+                               <MatchScheduleModal match={match} />
+                               <MatchScoreModal match={match} />
+                             </div>
+                           )}
+                         </TableCell>
+                       </TableRow>
+                     );
+                   })}
+                 </TableBody>
+               </Table>
+             </div>
+           ) : (
+             isGroupKnockout && hasKnockoutMatches && (
+               <div className="bg-white rounded-lg shadow border border-gray-200">
+                 <div className="p-4 border-b border-gray-200">
+                   <h2 className="text-xl font-semibold text-arang">Daftar Pertandingan Babak Gugur</h2>
+                 </div>
+                 <Table>
+                    <TableHeader>
+                     <TableRow>
+                       <TableHead>Ronde</TableHead>
+                       <TableHead>Posisi</TableHead>
+                       <TableHead>Tim A</TableHead>
+                       <TableHead>Tim B</TableHead>
+                       <TableHead>Status</TableHead>
+                       <TableHead>Jadwal</TableHead>
+                       <TableHead>Aksi</TableHead>
+                     </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                     {knockoutMatches.map(match => {
+                       const matchIsCustom = match.competition?.bracketFormat === "RACE_HEATS" || match.competition?.bracketFormat === "LEADERBOARD";
+                       return (
+                         <TableRow key={match.id}>
+                           <TableCell>{match.label || `Ronde ${match.round}`}</TableCell>
+                           <TableCell>Match {match.position + 1}</TableCell>
+                           {matchIsCustom ? (
+                             <TableCell colSpan={2}>
+                               <div className="font-semibold text-arang">Peserta:</div>
+                               <div className="text-sm text-gray-600">
+                                 {match.matchTeams?.map(mt => mt.team.name).join(", ") || "Belum ada tim"}
+                               </div>
+                             </TableCell>
+                           ) : (
+                             <>
+                               <TableCell>{match.teamA?.name || "-"}</TableCell>
+                               <TableCell>{match.teamB?.name || "-"}</TableCell>
+                             </>
+                           )}
+                           <TableCell>
+                             <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
+                               {match.status}
+                             </Badge>
+                             {matchIsCustom ? (
+                               match.status === "COMPLETED" && (
+                                 <div className="mt-1 text-xs space-y-0.5">
+                                   {match.matchTeams
+                                     ?.filter((mt) => mt.rank !== null)
+                                     .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+                                     .map((mt) => (
+                                       <div key={mt.id} className="text-green-600 font-semibold">
+                                         Juara {mt.rank}: {mt.team.name}
+                                       </div>
+                                     ))}
+                                 </div>
+                               )
+                             ) : (
+                               match.winnerTeam && (
+                                 <span className="ml-2 text-sm text-green-600 font-semibold">
+                                   Pemenang: {match.winnerTeam.name}
+                                 </span>
+                               )
+                             )}
+                           </TableCell>
+                           <TableCell>
+                             {match.court || match.scheduledAt ? (
+                               <div className="text-xs">
+                                 <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
+                                 <p className="text-gray-500">
+                                   {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                                 </p>
+                               </div>
+                             ) : (
+                               <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
+                             )}
+                           </TableCell>
+                           <TableCell>
+                             {match.status !== "BYE" && (
+                               <div className="flex gap-2">
+                                 <MatchScheduleModal match={match} />
+                                 <MatchScoreModal match={match} />
+                               </div>
+                             )}
+                           </TableCell>
+                         </TableRow>
+                       );
+                     })}
+                   </TableBody>
+                 </Table>
+               </div>
+             )
+           )}
         </div>
       )}
     </div>

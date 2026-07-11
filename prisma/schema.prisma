@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "library"
 }
 
@@ -17,6 +17,7 @@ model Competition {
   teamSize         Int // 1 = perorangan, 2 = ganda, 3 = 3v3
   pairingMode      PairingMode // SOLO | RANDOM | MANUAL
   bracketFormat    BracketFormat // SINGLE_ELIM | ROUND_ROBIN | GROUP_KNOCKOUT
+  heatSize         Int?
   maxParticipants  Int?
   registrationOpen Boolean           @default(true)
   status           CompetitionStatus @default(REGISTRATION)
@@ -30,11 +31,13 @@ model Competition {
 
 model Photo {
   id            String      @id @default(cuid())
-  url           String      // "/uploads/filename"
+  url           String // "/uploads/filename"
   caption       String?
   competitionId String
   createdAt     DateTime    @default(now())
   competition   Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+
+  @@index([competitionId])
 }
 
 model Participant {
@@ -42,7 +45,7 @@ model Participant {
   name          String
   houseBlock    String // Blok, e.g. "C3"
   houseNumber   String // Nomor rumah
-  phone         String         // WhatsApp; doubles as a soft identity
+  phone         String // WhatsApp; doubles as a soft identity
   createdAt     DateTime       @default(now())
   registrations Registration[]
 
@@ -54,11 +57,12 @@ model Registration {
   competitionId String
   participantId String
   createdAt     DateTime    @default(now())
-  competition   Competition @relation(fields: [competitionId], references: [id])
-  participant   Participant @relation(fields: [participantId], references: [id])
+  competition   Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
   teamMember    TeamMember?
 
   @@unique([competitionId, participantId]) // no double-registering the same comp
+  @@index([participantId])
 }
 
 model Team {
@@ -66,20 +70,25 @@ model Team {
   competitionId String
   name          String // auto: "Tim 1" or "Budi & Andi"
   seed          Int?
-  group         String?      // "A", "B", "C", "D" etc. for group stage
-  competition   Competition  @relation(fields: [competitionId], references: [id])
+  group         String? // "A", "B", "C", "D" etc. for group stage
+  competition   Competition  @relation(fields: [competitionId], references: [id], onDelete: Cascade)
   members       TeamMember[]
   matchesAsA    Match[]      @relation("TeamA")
   matchesAsB    Match[]      @relation("TeamB")
   matchesWon    Match[]      @relation("WinnerTeam")
+  matchTeams    MatchTeam[]
+
+  @@index([competitionId])
 }
 
 model TeamMember {
   id             String       @id @default(cuid())
   teamId         String
   registrationId String       @unique
-  team           Team         @relation(fields: [teamId], references: [id])
-  registration   Registration @relation(fields: [registrationId], references: [id])
+  team           Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
 }
 
 model Match {
@@ -101,9 +110,16 @@ model Match {
   nextSlot        Slot? // into slot A or B of the next match
   court           String? // "Lapangan 1"
   scheduledAt     DateTime?
-  competition     Competition @relation(fields: [competitionId], references: [id])
+  competition     Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
   teamA           Team?       @relation("TeamA", fields: [teamAId], references: [id])
   teamB           Team?       @relation("TeamB", fields: [teamBId], references: [id])
+  matchTeams      MatchTeam[]
+
+  @@index([competitionId])
+  @@index([teamAId])
+  @@index([teamBId])
+  @@index([winnerTeamId])
+  @@index([nextMatchId])
 }
 
 enum PairingMode {
@@ -116,6 +132,8 @@ enum BracketFormat {
   SINGLE_ELIM
   ROUND_ROBIN
   GROUP_KNOCKOUT
+  RACE_HEATS
+  LEADERBOARD
 }
 
 enum CompetitionStatus {
@@ -137,4 +155,18 @@ enum MatchStatus {
 enum Slot {
   A
   B
+}
+
+model MatchTeam {
+  id       String  @id @default(cuid())
+  matchId  String
+  teamId   String
+  rank     Int?
+  isWinner Boolean @default(false)
+
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team  Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, teamId])
+  @@index([teamId])
 }

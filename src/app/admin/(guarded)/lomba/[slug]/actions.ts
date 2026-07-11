@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { ADMIN_AUTH_COOKIE } from "@/lib/constants";
 import { MatchStatus, Slot } from "@prisma/client";
+import { generateHeatsStructure } from "@/lib/tournament-utils";
 
 async function verifyAuth() {
   const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
@@ -154,34 +155,53 @@ export async function generateBracketAction(
     }
 
     // Use Prisma transaction to insert all
-    const result = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       // If resolving via ADD_PANITIA, create dummy registrations first
       if (remainder !== 0 && leftoverResolution?.action === "ADD_PANITIA") {
         const needed = teamSize - remainder;
+        const newParticipants = [];
+        const newRegistrations = [];
+
         for (let i = 0; i < needed; i++) {
+          const participantId = crypto.randomUUID();
+          const registrationId = crypto.randomUUID();
           const dummyPhone = `08-PANITIA-${crypto.randomUUID().slice(0, 8)}`;
           const dummyName = `Panitia Penyelamat ${i + 1}`;
-          
-          const part = await tx.participant.create({
-            data: {
-              name: dummyName,
-              phone: dummyPhone,
-              houseBlock: "P",
-              houseNumber: "0",
-            }
-          });
-          
-          const reg = await tx.registration.create({
-            data: {
-              competitionId,
-              participantId: part.id,
-            },
-            include: {
-              participant: true,
-            }
-          });
-          
+
+          const part = {
+            id: participantId,
+            name: dummyName,
+            phone: dummyPhone,
+            houseBlock: "P",
+            houseNumber: "0",
+            createdAt: new Date(),
+          };
+
+          const reg = {
+            id: registrationId,
+            competitionId,
+            participantId: participantId,
+            createdAt: new Date(),
+            participant: part,
+          };
+
+          newParticipants.push(part);
+          newRegistrations.push(reg);
           regs.push(reg);
+        }
+
+        if (newParticipants.length > 0) {
+          await tx.participant.createMany({
+            data: newParticipants,
+          });
+          await tx.registration.createMany({
+            data: newRegistrations.map((r) => ({
+              id: r.id,
+              competitionId: r.competitionId,
+              participantId: r.participantId,
+              createdAt: r.createdAt,
+            })),
+          });
         }
       }
 
@@ -296,26 +316,43 @@ export async function generateBracketAction(
       await tx.team.deleteMany({ where: { competitionId } });
 
       // Insert Teams
-      for (const t of newTeams) {
-        await tx.team.create({
-          data: {
-            id: t.id,
-            competitionId: t.competitionId,
-            name: t.name,
-            group: t.group,
-            members: {
-              create: t.members.map((m) => ({
-                id: m.id,
-                registrationId: m.registrationId
-              }))
-            }
-          }
+      await tx.team.createMany({
+        data: newTeams.map((t) => ({
+          id: t.id,
+          competitionId: t.competitionId,
+          name: t.name,
+          group: t.group,
+        }))
+      });
+
+      // Insert Team Members
+      const allMembers = newTeams.flatMap((t) => t.members.map((m) => ({
+        id: m.id,
+        teamId: t.id,
+        registrationId: m.registrationId,
+      })));
+
+      if (allMembers.length > 0) {
+        await tx.teamMember.createMany({
+          data: allMembers
         });
       }
 
       if (isRoundRobin || isGroupKnockout) {
         // Generate Round Robin matches for each group
-        const allGroupMatches: any[] = [];
+        const allGroupMatches: {
+          id: string;
+          competitionId: string;
+          round: number;
+          position: number;
+          label: string;
+          teamAId: string;
+          teamBId: string;
+          status: MatchStatus;
+          winnerTeamId: string | null;
+          nextMatchId: string | null;
+          nextSlot: Slot | null;
+        }[] = [];
         for (const groupName of groupNames) {
           const groupTeams = newTeams.filter(t => t.group === groupName);
           const n = groupTeams.length;
@@ -360,6 +397,85 @@ export async function generateBracketAction(
         await tx.match.createMany({
           data: allGroupMatches
         });
+
+      } else if (comp.bracketFormat === "LEADERBOARD") {
+        const matchId = crypto.randomUUID();
+        await tx.match.create({
+          data: {
+            id: matchId,
+            competitionId: comp.id,
+            round: 1,
+            position: 0,
+            label: "Treasure Hunt",
+            status: "READY",
+          }
+        });
+
+        await tx.matchTeam.createMany({
+          data: newTeams.map((t) => ({
+            id: crypto.randomUUID(),
+            matchId: matchId,
+            teamId: t.id,
+            isWinner: false,
+          }))
+        });
+
+      } else if (comp.bracketFormat === "RACE_HEATS") {
+        const heatSize = comp.heatSize ?? 3;
+        const generatedHeats = generateHeatsStructure(newTeams.map(t => t.id), heatSize);
+
+        // Generate a map of `round_position` to a pre-generated Match ID.
+        const matchIdMap = new Map<string, string>();
+        for (const gh of generatedHeats) {
+          matchIdMap.set(`${gh.round}_${gh.position}`, crypto.randomUUID());
+        }
+
+        // Create matches in the database
+        const matchesData = generatedHeats.map(gh => {
+          const dbMatchId = matchIdMap.get(`${gh.round}_${gh.position}`)!;
+          let nextMatchId: string | null = null;
+          if (gh.nextMatchId) {
+            const nextGH = generatedHeats.find(h => h.id === gh.nextMatchId);
+            if (nextGH) {
+              nextMatchId = matchIdMap.get(`${nextGH.round}_${nextGH.position}`) || null;
+            }
+          }
+          return {
+            id: dbMatchId,
+            competitionId: comp.id,
+            round: gh.round,
+            position: gh.position,
+            label: gh.label,
+            status: (gh.round === 1 ? "READY" : "PENDING") as MatchStatus,
+            nextMatchId: nextMatchId,
+          };
+        });
+
+        await tx.match.createMany({
+          data: matchesData
+        });
+
+        // Create MatchTeam records to seed initial teams into Round 1 matches
+        const matchTeamsData = [];
+        for (const gh of generatedHeats) {
+          if (gh.round === 1) {
+            const dbMatchId = matchIdMap.get(`${gh.round}_${gh.position}`)!;
+            for (const teamId of gh.teamIds) {
+              matchTeamsData.push({
+                id: crypto.randomUUID(),
+                matchId: dbMatchId,
+                teamId: teamId,
+                isWinner: false,
+              });
+            }
+          }
+        }
+
+        if (matchTeamsData.length > 0) {
+          await tx.matchTeam.createMany({
+            data: matchTeamsData
+          });
+        }
 
       } else {
         // Single Elimination (original logic)
@@ -572,14 +688,16 @@ export async function scheduleMatchAction(
 
 export async function getStandingsForCompetition(competitionId: string) {
   const teams = await prisma.team.findMany({
-    where: { competitionId },
-    include: { members: { include: { registration: { include: { participant: true } } } } }
+    where: { competitionId }
   });
 
   const matches = await prisma.match.findMany({
     where: {
       competitionId,
-      label: { startsWith: "Grup" },
+      OR: [
+        { label: { startsWith: "Grup" } },
+        { label: "Round Robin" }
+      ],
       status: "COMPLETED"
     }
   });
@@ -708,7 +826,8 @@ export async function generateKnockoutBracketAction(competitionId: string) {
     const groups = Object.keys(standings).sort();
 
     // Collect top 2 teams from each group
-    const qualifiedTeams: any[] = [];
+    type TeamFromDb = Awaited<ReturnType<typeof prisma.team.findMany>>[number];
+    const qualifiedTeams: TeamFromDb[] = [];
     for (const groupName of groups) {
       const groupList = standings[groupName];
       if (groupList[0]) qualifiedTeams.push(groupList[0].team);
@@ -929,5 +1048,171 @@ export async function generateKnockoutBracketAction(competitionId: string) {
   } catch (error) {
     console.error("Failed to generate knockout stage:", error);
     return { error: "Failed to generate knockout stage." };
+  }
+}
+
+export async function saveMatchRankingsAction(
+  matchId: string,
+  rankings: { teamId: string; rank: number | null }[]
+) {
+  try {
+    await verifyAuth();
+
+    const match = await prisma.match.findUnique({
+      where: { id: matchId },
+      include: {
+        competition: true,
+        matchTeams: true,
+      },
+    });
+
+    if (!match) {
+      return { error: "Match not found" };
+    }
+
+    const { bracketFormat } = match.competition;
+    if (bracketFormat !== "RACE_HEATS" && bracketFormat !== "LEADERBOARD") {
+      return { error: "Format pertandingan harus RACE_HEATS atau LEADERBOARD." };
+    }
+
+    // Check that there are no duplicate ranks (e.g. no two teams can be both Juara 1)
+    const nonNullRanks = rankings.map((r) => r.rank).filter((r): r is number => r !== null);
+    const uniqueRanks = new Set(nonNullRanks);
+    if (nonNullRanks.length !== uniqueRanks.size) {
+      return { error: "Peringkat tidak boleh kembar (duplikat)." };
+    }
+
+    // For RACE_HEATS, validate that there is exactly one Rank 1 (Juara 1)
+    if (bracketFormat === "RACE_HEATS") {
+      const rank1Count = rankings.filter((r) => r.rank === 1).length;
+      if (rank1Count !== 1) {
+        return { error: "Harus ada tepat satu Juara 1 untuk RACE_HEATS." };
+      }
+    }
+
+    // For LEADERBOARD, validate that Rank 1, 2, and 3 are unique
+    if (bracketFormat === "LEADERBOARD") {
+      const rank1Count = rankings.filter((r) => r.rank === 1).length;
+      const rank2Count = rankings.filter((r) => r.rank === 2).length;
+      const rank3Count = rankings.filter((r) => r.rank === 3).length;
+      const teamCount = match.matchTeams.length;
+
+      if (teamCount >= 3) {
+        if (rank1Count !== 1 || rank2Count !== 1 || rank3Count !== 1) {
+          return { error: "Untuk LEADERBOARD, Juara 1, 2, dan 3 masing-masing harus dipilih tepat satu kali." };
+        }
+      } else {
+        for (let i = 1; i <= teamCount; i++) {
+          const count = rankings.filter((r) => r.rank === i).length;
+          if (count !== 1) {
+            return { error: `Juara ${i} harus ditentukan.` };
+          }
+        }
+      }
+    }
+
+    const winnerRanking = rankings.find((r) => r.rank === 1);
+    const winnerTeamId = winnerRanking ? winnerRanking.teamId : null;
+
+    await prisma.$transaction(async (tx) => {
+      // Verify that the next match is not already completed
+      if (match.nextMatchId) {
+        const nextMatch = await tx.match.findUnique({ where: { id: match.nextMatchId } });
+        if (nextMatch && nextMatch.status === "COMPLETED") {
+          throw new Error("Pertandingan berikutnya sudah selesai. Peringkat tidak dapat diubah.");
+        }
+      }
+
+      // If winner changed, delete the old winner's MatchTeam record from the next match
+      if (match.winnerTeamId && match.winnerTeamId !== winnerTeamId && match.nextMatchId) {
+        await tx.matchTeam.deleteMany({
+          where: {
+            matchId: match.nextMatchId,
+            teamId: match.winnerTeamId
+          }
+        });
+      }
+
+      // Update each team's rank and set isWinner = (rank === 1) in MatchTeam
+      for (const r of rankings) {
+        await tx.matchTeam.update({
+          where: {
+            matchId_teamId: {
+              matchId: matchId,
+              teamId: r.teamId,
+            },
+          },
+          data: {
+            rank: r.rank,
+            isWinner: r.rank === 1,
+          },
+        });
+      }
+
+      // Update the match status to COMPLETED
+      await tx.match.update({
+        where: { id: matchId },
+        data: {
+          status: "COMPLETED",
+          winnerTeamId: winnerTeamId,
+        },
+      });
+
+      // For RACE_HEATS, if match.nextMatchId is present, find the winner (Rank 1 team)
+      // and advance them to the next match by creating a new MatchTeam record there if not already present.
+      // Also, set the next match status to READY.
+      if (bracketFormat === "RACE_HEATS") {
+        if (match.nextMatchId && winnerTeamId) {
+          const existingMatchTeam = await tx.matchTeam.findUnique({
+            where: {
+              matchId_teamId: {
+                matchId: match.nextMatchId,
+                teamId: winnerTeamId,
+              },
+            },
+          });
+
+          if (!existingMatchTeam) {
+            await tx.matchTeam.create({
+              data: {
+                matchId: match.nextMatchId,
+                teamId: winnerTeamId,
+                isWinner: false,
+              },
+            });
+          }
+
+          await tx.match.update({
+            where: { id: match.nextMatchId },
+            data: { status: "READY" },
+          });
+        } else if (!match.nextMatchId) {
+          // If no nextMatchId, then the final match has ended
+          await tx.competition.update({
+            where: { id: match.competitionId },
+            data: { status: "DONE" },
+          });
+        }
+      }
+
+      // For LEADERBOARD, update the competition status to DONE
+      if (bracketFormat === "LEADERBOARD") {
+        await tx.competition.update({
+          where: { id: match.competitionId },
+          data: { status: "DONE" },
+        });
+      }
+    });
+
+    revalidatePath("/admin");
+    revalidatePath(`/admin/lomba/[slug]`, "page");
+    revalidatePath(`/lomba/[slug]`, "page");
+    revalidatePath(`/lomba/[slug]/bagan`, "page");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to save match rankings:", error);
+    const message = error instanceof Error ? error.message : "Failed to save match rankings.";
+    return { error: message };
   }
 }

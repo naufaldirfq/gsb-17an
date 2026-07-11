@@ -16,6 +16,7 @@ export function AddCompetitionModal() {
   const [teamSize, setTeamSize] = useState("1");
   const [pairingMode, setPairingMode] = useState("SOLO");
   const [bracketFormat, setBracketFormat] = useState("SINGLE_ELIM");
+  const [heatSize, setHeatSize] = useState("3");
   const router = useRouter();
 
   const applyPreset = (preset: "solo" | "ganda_acak" | "tim_manual") => {
@@ -38,6 +39,7 @@ export function AddCompetitionModal() {
     formData.set("teamSize", teamSize);
     formData.set("pairingMode", pairingMode);
     formData.set("bracketFormat", bracketFormat);
+    formData.set("heatSize", bracketFormat === "RACE_HEATS" ? heatSize : "");
 
     const res = await createCompetitionAction(formData);
     if (res.error) {
@@ -92,9 +94,9 @@ export function AddCompetitionModal() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Sistem Pasangan</Label>
+              <Label htmlFor="pairingMode">Sistem Pasangan</Label>
               <Select value={pairingMode} onValueChange={(val) => setPairingMode(val ?? "SOLO")}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger id="pairingMode"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-white">
                   <SelectItem value="SOLO">SOLO</SelectItem>
                   <SelectItem value="RANDOM">RANDOM (Acak)</SelectItem>
@@ -103,17 +105,32 @@ export function AddCompetitionModal() {
               </Select>
             </div>
             <div>
-              <Label>Sistem Bagan</Label>
+              <Label htmlFor="bracketFormat">Sistem Bagan</Label>
               <Select value={bracketFormat} onValueChange={(val) => setBracketFormat(val ?? "SINGLE_ELIM")}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger id="bracketFormat"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-white">
                   <SelectItem value="SINGLE_ELIM">Single Elimination</SelectItem>
                   <SelectItem value="ROUND_ROBIN">Round Robin</SelectItem>
                   <SelectItem value="GROUP_KNOCKOUT">Group + Knockout</SelectItem>
+                  <SelectItem value="RACE_HEATS">Balap / Renang (Multi-heat)</SelectItem>
+                  <SelectItem value="LEADERBOARD">Satu Babak (Leaderboard)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
+          {bracketFormat === "RACE_HEATS" && (
+            <div>
+              <Label htmlFor="heatSize">Jumlah Peserta per Heat</Label>
+              <Input
+                id="heatSize"
+                type="number"
+                min={2}
+                required
+                value={heatSize}
+                onChange={(e) => setHeatSize(e.target.value)}
+              />
+            </div>
+          )}
           <Button type="submit" className="w-full bg-merah hover:bg-merah-tua text-white cursor-pointer">Simpan Lomba</Button>
         </form>
       </DialogContent>

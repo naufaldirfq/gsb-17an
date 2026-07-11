@@ -23,6 +23,12 @@ export default async function PublicBracketPage({
           teamA: true,
           teamB: true,
           winnerTeam: true,
+          competition: true,
+          matchTeams: {
+            include: {
+              team: true,
+            },
+          },
         },
         orderBy: [
           { round: 'asc' },
@@ -38,6 +44,8 @@ export default async function PublicBracketPage({
 
   const isGroupKnockout = competition.bracketFormat === "GROUP_KNOCKOUT";
   const isRoundRobin = competition.bracketFormat === "ROUND_ROBIN";
+  const isLeaderboard = competition.bracketFormat === "LEADERBOARD";
+  const isRaceHeats = competition.bracketFormat === "RACE_HEATS";
 
   const groupMatches = competition.matches.filter(m => m.label && (m.label.startsWith("Grup") || m.label === "Round Robin"));
   const knockoutMatches = competition.matches.filter(m => !m.label || (!m.label.startsWith("Grup") && m.label !== "Round Robin"));
@@ -49,6 +57,258 @@ export default async function PublicBracketPage({
     ? await getStandingsForCompetition(competition.id)
     : null;
 
+  // For LEADERBOARD format
+  if (isLeaderboard) {
+    const leaderboardMatch = competition.matches[0];
+    const leaderboardParticipants = leaderboardMatch?.matchTeams || [];
+    const sortedLeaderboard = [...leaderboardParticipants].sort((a, b) => {
+      if (a.rank === null && b.rank === null) return 0;
+      if (a.rank === null) return 1;
+      if (b.rank === null) return -1;
+      return a.rank - b.rank;
+    });
+
+    const getMedalBadge = (rank: number | null) => {
+      if (rank === null) return null;
+      if (rank === 1) {
+        return (
+          <Badge className="bg-emas/10 text-emas border border-emas/30 hover:bg-emas/15 font-bold font-jakarta text-xs flex items-center gap-1">
+            🥇 Juara 1
+          </Badge>
+        );
+      }
+      if (rank === 2) {
+        return (
+          <Badge className="bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-150 font-bold font-jakarta text-xs flex items-center gap-1">
+            🥈 Juara 2
+          </Badge>
+        );
+      }
+      if (rank === 3) {
+        return (
+          <Badge className="bg-[#B08D57]/10 text-[#B08D57] border border-[#B08D57]/30 hover:bg-[#B08D57]/15 font-bold font-jakarta text-xs flex items-center gap-1">
+            🥉 Juara 3
+          </Badge>
+        );
+      }
+      return (
+        <Badge variant="outline" className="text-arang/60 border-border font-medium text-xs">
+          Peringkat {rank}
+        </Badge>
+      );
+    };
+
+    return (
+      <main className="flex flex-col items-center w-full min-h-screen px-6 py-12 bg-putih-kertas">
+        <div className="max-w-4xl w-full flex flex-col gap-8">
+          <div>
+            <Link href={`/lomba/${slug}`} className="text-arang/60 text-sm font-medium hover:text-merah transition-colors">
+              &larr; Kembali ke Detail Lomba
+            </Link>
+            <div className="flex items-center justify-between mt-4">
+              <h1 className="font-anton text-4xl text-merah tracking-tight">Klasemen {competition.name}</h1>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <h2 className="font-anton text-2xl text-arang tracking-tight">Papan Peringkat (Leaderboard)</h2>
+            {!leaderboardMatch || sortedLeaderboard.length === 0 ? (
+              <div className="text-center p-12 bg-surface rounded-xl border border-border">
+                <h2 className="text-xl font-bold text-arang">Hasil klasemen belum tersedia</h2>
+                <p className="text-arang/60 mt-2">Pertandingan belum selesai atau peringkat belum diinput oleh admin.</p>
+              </div>
+            ) : (
+              <Card className="border-border bg-surface overflow-hidden shadow-md">
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm border-collapse text-left">
+                      <thead>
+                        <tr className="border-b border-border bg-arang/5 text-xs text-arang/60 font-semibold font-jetbrains">
+                          <th className="py-3 px-4 text-center w-16">Rank</th>
+                          <th className="py-3 px-4">Nama Tim / Peserta</th>
+                          <th className="py-3 px-4 text-right">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedLeaderboard.map((mt) => {
+                          const hasRank = mt.rank !== null;
+                          
+                          return (
+                            <tr key={mt.id} className={`border-b border-border last:border-0 hover:bg-arang/5 transition-colors ${
+                              mt.rank === 1 ? "bg-emas/5" : ""
+                            }`}>
+                              <td className="py-4 px-4 text-center font-bold font-jetbrains">
+                                {hasRank ? mt.rank : "-"}
+                              </td>
+                              <td className="py-4 px-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                  <span className={`font-semibold text-base ${mt.rank === 1 ? "text-emas" : "text-arang"}`}>
+                                    {mt.team.name}
+                                  </span>
+                                  {mt.rank !== null && (
+                                    <div className="inline-flex self-start sm:self-center">
+                                      {getMedalBadge(mt.rank)}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 text-right">
+                                {mt.isWinner && (
+                                  <Badge className="bg-emas hover:bg-emas text-white font-bold text-xs uppercase tracking-wider">
+                                    Winner 🎉
+                                  </Badge>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // For RACE_HEATS format
+  if (isRaceHeats) {
+    const heatsByRound = competition.matches.reduce((acc, match) => {
+      if (!acc[match.round]) {
+        acc[match.round] = [];
+      }
+      acc[match.round].push(match);
+      return acc;
+    }, {} as Record<number, typeof competition.matches>);
+
+    const heatRounds = Object.keys(heatsByRound).map(Number).sort((a, b) => a - b);
+
+    return (
+      <main className="flex flex-col items-center w-full min-h-screen px-6 py-12 bg-putih-kertas">
+        <div className="max-w-6xl w-full flex flex-col gap-8">
+          <div>
+            <Link href={`/lomba/${slug}`} className="text-arang/60 text-sm font-medium hover:text-merah transition-colors">
+              &larr; Kembali ke Detail Lomba
+            </Link>
+            <div className="flex items-center justify-between mt-4">
+              <h1 className="font-anton text-4xl text-merah tracking-tight">Bagan Babak {competition.name}</h1>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <h2 className="font-anton text-2xl text-arang tracking-tight">Jadwal & Hasil Heats</h2>
+            
+            {heatRounds.length === 0 ? (
+              <div className="text-center p-12 bg-surface rounded-xl border border-border">
+                <h2 className="text-xl font-bold text-arang">Heats belum tersedia</h2>
+                <p className="text-arang/60 mt-2">Pendaftaran mungkin masih berlangsung atau heats belum di-generate oleh admin.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto pb-6">
+                <div className="flex gap-6 min-w-[800px] md:min-w-full">
+                  {heatRounds.map(round => {
+                    const matches = heatsByRound[round];
+                    const roundLabel = matches[0]?.label || `Round ${round}`;
+                    
+                    return (
+                      <div key={round} className="flex-1 min-w-[280px] max-w-[360px] space-y-4">
+                        <div className="flex items-center justify-between border-b border-border pb-2">
+                          <h3 className="font-anton text-xl text-arang tracking-tight">{roundLabel}</h3>
+                          <Badge variant="secondary" className="font-jetbrains text-xs">
+                            {matches.length} Heat{matches.length > 1 ? "s" : ""}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex flex-col gap-4">
+                          {matches.map(match => {
+                            const sortedMatchTeams = [...match.matchTeams].sort((a, b) => {
+                              if (a.rank === null && b.rank === null) return 0;
+                              if (a.rank === null) return 1;
+                              if (b.rank === null) return -1;
+                              return a.rank - b.rank;
+                            });
+                            
+                            return (
+                              <Card key={match.id} className="border-border bg-surface overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                                <div className="bg-arang/5 px-4 py-2 flex justify-between items-center border-b border-border">
+                                  <span className="text-xs font-jetbrains font-bold text-arang/60">
+                                    Heat {match.position + 1}
+                                  </span>
+                                  <Badge variant={match.status === "COMPLETED" ? "default" : match.status === "BYE" ? "secondary" : "outline"} className={match.status === "COMPLETED" ? "bg-merah hover:bg-merah-tua" : ""}>
+                                    {match.status}
+                                  </Badge>
+                                </div>
+                                
+                                <CardContent className="p-4 space-y-2">
+                                  {sortedMatchTeams.length === 0 ? (
+                                    <p className="text-xs text-arang/40 text-center py-2">Belum ada peserta</p>
+                                  ) : (
+                                    <div className="space-y-2">
+                                      {sortedMatchTeams.map(mt => {
+                                        const isWinner = mt.isWinner || mt.rank === 1;
+                                        return (
+                                          <div 
+                                            key={mt.id} 
+                                            className={`flex justify-between items-center p-2 rounded-md transition-colors ${
+                                              isWinner 
+                                                ? "border-2 border-emas bg-emas/10 font-bold" 
+                                                : "border border-border/40 bg-arang/5"
+                                            }`}
+                                          >
+                                            <span className={`text-sm ${isWinner ? "text-emas font-bold" : "text-arang font-medium"}`}>
+                                              {mt.team.name}
+                                            </span>
+                                            {mt.rank !== null && (
+                                              <Badge className={`text-[10px] font-bold ${
+                                                isWinner 
+                                                  ? "bg-emas hover:bg-emas text-white" 
+                                                  : "bg-arang/10 text-arang/75 hover:bg-arang/15"
+                                              }`}>
+                                                Juara {mt.rank}
+                                              </Badge>
+                                            )}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                  
+                                  {(match.court || match.scheduledAt) && (
+                                    <div className="flex flex-col gap-1 pt-2 border-t border-border/20 text-[10px] text-arang/60 font-medium">
+                                      {match.scheduledAt && (
+                                        <div className="flex items-center gap-1">
+                                          <CalendarIcon className="w-3.5 h-3.5 text-arang/40" />
+                                          <span>{new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" })}</span>
+                                        </div>
+                                      )}
+                                      {match.court && (
+                                        <div className="flex items-center gap-1">
+                                          <MapPinIcon className="w-3.5 h-3.5 text-arang/40" />
+                                          <span>{match.court}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   if (!hasMatches) {
     return (
       <main className="flex flex-col items-center w-full min-h-screen px-6 py-12 bg-putih-kertas">
@@ -57,7 +317,7 @@ export default async function PublicBracketPage({
             <Link href={`/lomba/${slug}`} className="text-arang/60 text-sm font-medium hover:text-merah transition-colors">
               &larr; Kembali ke Detail Lomba
             </Link>
-            <h1 className="font-anton text-4xl text-merah mt-4 tracking-wide">Bagan {competition.name}</h1>
+            <h1 className="font-anton text-4xl text-merah mt-4 tracking-tight">Bagan {competition.name}</h1>
           </div>
           <div className="text-center p-12 bg-surface rounded-xl border border-border">
             <h2 className="text-xl font-bold text-arang">Bagan belum tersedia</h2>
@@ -86,13 +346,13 @@ export default async function PublicBracketPage({
             &larr; Kembali ke Detail Lomba
           </Link>
           <div className="flex items-center justify-between mt-4">
-            <h1 className="font-anton text-4xl text-merah tracking-wide">Bagan {competition.name}</h1>
+            <h1 className="font-anton text-4xl text-merah tracking-tight">Bagan {competition.name}</h1>
           </div>
         </div>
 
         {standings && (
           <div className="space-y-6">
-            <h2 className="font-anton text-2xl text-arang tracking-wide">Klasemen Sementara</h2>
+            <h2 className="font-anton text-2xl text-arang tracking-tight">Klasemen Sementara</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {Object.entries(standings).map(([groupName, groupStandings]) => (
                 <div key={groupName} className="border border-border rounded-lg overflow-hidden bg-surface">
@@ -143,7 +403,7 @@ export default async function PublicBracketPage({
         {/* Group matches list */}
         {(isGroupKnockout || isRoundRobin) && groupMatches.length > 0 && (
           <div className="space-y-6">
-            <h2 className="font-anton text-2xl text-arang tracking-wide">Pertandingan Babak Grup</h2>
+            <h2 className="font-anton text-2xl text-arang tracking-tight">Pertandingan Babak Grup</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {groupMatches.map(match => (
                 <Card key={match.id} className="border-border bg-surface overflow-hidden hover:shadow-md transition-shadow">
@@ -204,7 +464,7 @@ export default async function PublicBracketPage({
 
         <div className="flex flex-col gap-12">
           {rounds.length > 0 && (isGroupKnockout ? hasKnockoutMatches : true) && (
-            <h2 className="font-anton text-2xl text-arang tracking-wide">
+            <h2 className="font-anton text-2xl text-arang tracking-tight">
               {isGroupKnockout ? "Bagan Babak Gugur" : "Bagan Pertandingan"}
             </h2>
           )}
@@ -215,7 +475,7 @@ export default async function PublicBracketPage({
             return (
               <div key={round} className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <h2 className="font-anton text-2xl text-arang tracking-wide">{roundLabel}</h2>
+                  <h2 className="font-anton text-2xl text-arang tracking-tight">{roundLabel}</h2>
                   <div className="h-px bg-border flex-1"></div>
                 </div>
                 

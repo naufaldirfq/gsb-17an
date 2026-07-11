@@ -103,6 +103,7 @@ describe("registerAction", () => {
 
     const prisma = (await import("@/lib/prisma")).default;
     // Mock the success flow
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (prisma.competition.findUnique as any).mockResolvedValue({
       id: "any-comp",
       _count: { registrations: 0 },
@@ -110,8 +111,11 @@ describe("registerAction", () => {
       registrationOpen: true,
       status: "REGISTRATION",
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (prisma.participant.upsert as any).mockResolvedValue({ id: "p1" });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (prisma.registration.findUnique as any).mockResolvedValue(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (prisma.registration.create as any).mockResolvedValue({});
 
     // First 5 attempts should succeed/pass rate limiter (they might fail on other things or succeed, but they won't get rate limited)

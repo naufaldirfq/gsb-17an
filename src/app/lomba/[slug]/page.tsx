@@ -34,6 +34,11 @@ export default async function LombaDetail({
           teamA: true,
           teamB: true,
           winnerTeam: true,
+          matchTeams: {
+            include: {
+              team: true,
+            },
+          },
         },
         orderBy: [
           { round: "asc" },
@@ -53,6 +58,7 @@ export default async function LombaDetail({
 
   const isGroupKnockout = competition.bracketFormat === "GROUP_KNOCKOUT";
   const isRoundRobin = competition.bracketFormat === "ROUND_ROBIN";
+  const isCustomFormat = competition.bracketFormat === "RACE_HEATS" || competition.bracketFormat === "LEADERBOARD";
 
   const groupMatches = competition.matches.filter(m => m.label && (m.label.startsWith("Grup") || m.label === "Round Robin"));
   const knockoutMatches = competition.matches.filter(m => !m.label || (!m.label.startsWith("Grup") && m.label !== "Round Robin"));
@@ -68,7 +74,7 @@ export default async function LombaDetail({
           <Link href="/lomba" className="text-arang/60 text-sm font-medium hover:text-merah transition-colors" aria-label="Kembali ke Daftar Lomba">
             &larr; Kembali ke Daftar
           </Link>
-          <h1 className="font-anton text-4xl text-merah mt-4 tracking-wide">{competition.name}</h1>
+          <h1 className="font-anton text-4xl text-merah mt-4 tracking-tight">{competition.name}</h1>
           
           <div className="mt-4">
             <WhatsAppShare competitionName={competition.name} />
@@ -90,7 +96,7 @@ export default async function LombaDetail({
         {competition.description && (
           <Card className="border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="font-anton text-xl text-arang tracking-wide">Deskripsi</CardTitle>
+              <CardTitle className="font-anton text-xl text-arang tracking-tight">Deskripsi</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.description}</p>
@@ -101,7 +107,7 @@ export default async function LombaDetail({
         {competition.rules && (
           <Card className="border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="font-anton text-xl text-arang tracking-wide">Peraturan Lomba</CardTitle>
+              <CardTitle className="font-anton text-xl text-arang tracking-tight">Peraturan Lomba</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-arang/80 leading-relaxed whitespace-pre-wrap">{competition.rules}</p>
@@ -111,7 +117,7 @@ export default async function LombaDetail({
 
         <Card className="border-border">
           <CardHeader className="pb-2">
-            <CardTitle className="font-anton text-2xl text-arang tracking-wide">Pendaftaran</CardTitle>
+            <CardTitle className="font-anton text-2xl text-arang tracking-tight">Pendaftaran</CardTitle>
           </CardHeader>
           <CardContent>
             {!canRegister ? (
@@ -127,7 +133,7 @@ export default async function LombaDetail({
         {standings && (
           <Card className="border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="font-anton text-xl text-arang tracking-wide">Klasemen Sementara</CardTitle>
+              <CardTitle className="font-anton text-xl text-arang tracking-tight">Klasemen Sementara</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {Object.entries(standings).map(([groupName, groupStandings]) => (
@@ -178,9 +184,9 @@ export default async function LombaDetail({
 
         <Card className="border-border">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
-            <CardTitle className="font-anton text-xl text-arang tracking-wide">Jadwal & Hasil</CardTitle>
+            <CardTitle className="font-anton text-xl text-arang tracking-tight">Jadwal & Hasil</CardTitle>
             <Link href={`/lomba/${slug}/bagan`} className="text-xs font-semibold text-merah hover:underline">
-              Lihat Bagan &rarr;
+              {competition.bracketFormat === "LEADERBOARD" ? "Lihat Klasemen" : "Lihat Bagan"} &rarr;
             </Link>
           </CardHeader>
           <CardContent>
@@ -263,7 +269,7 @@ export default async function LombaDetail({
                 )}
 
                 {/* Standard matches list for Single Elimination */}
-                {!isGroupKnockout && !isRoundRobin && (
+                {!isGroupKnockout && !isRoundRobin && !isCustomFormat && (
                   <div className="flex flex-col gap-3">
                     {competition.matches
                       .filter((m) => m.status !== "BYE")
@@ -295,6 +301,62 @@ export default async function LombaDetail({
                       ))}
                   </div>
                 )}
+
+                {/* Custom matches list for Heats and Leaderboard */}
+                {isCustomFormat && (
+                  <div className="flex flex-col gap-3">
+                    {competition.matches
+                      .filter((m) => m.status !== "BYE")
+                      .map((match) => (
+                        <div key={match.id} className="p-3 border border-border rounded-lg bg-surface flex flex-col gap-2">
+                          <div className="flex justify-between items-center text-xs text-arang/60 font-semibold font-jetbrains">
+                            <span>{match.label || `Ronde ${match.round}`}</span>
+                            <span>Match {match.position + 1}</span>
+                          </div>
+                          
+                          <div className="text-sm text-arang flex flex-wrap gap-x-1 items-center">
+                            <span className="font-semibold text-arang/60">Peserta:</span>
+                            {match.matchTeams && match.matchTeams.length > 0 ? (
+                              <div className="inline-flex flex-wrap gap-x-1.5">
+                                {match.matchTeams.map((mt, idx) => {
+                                  const isWinner = mt.isWinner || mt.rank === 1;
+                                  return (
+                                    <span key={mt.id} className={isWinner ? "text-emas font-bold" : "text-arang font-medium"}>
+                                      {mt.team.name}
+                                      {idx < match.matchTeams.length - 1 ? "," : ""}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <span className="text-arang/40 font-medium">Belum ada tim</span>
+                            )}
+                          </div>
+
+                          {match.status === "COMPLETED" && (
+                            <div className="mt-1 text-xs space-y-0.5 border-t border-arang/5 pt-1">
+                              {match.matchTeams
+                                ?.filter((mt) => mt.rank !== null)
+                                .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+                                .map((mt) => (
+                                  <div key={mt.id} className={mt.isWinner || mt.rank === 1 ? "text-emas font-bold" : "text-arang/70"}>
+                                    Juara {mt.rank}: {mt.team.name}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+
+                          {(match.court || match.scheduledAt) && (
+                            <div className="text-xs text-arang/60 mt-1 font-medium bg-arang/5 py-0.5 px-1.5 rounded inline-block self-start">
+                              {match.court || ""}
+                              {match.court && match.scheduledAt && " • "}
+                              {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
@@ -302,7 +364,7 @@ export default async function LombaDetail({
 
         <Card className="border-border">
           <CardHeader className="pb-2">
-            <CardTitle className="font-anton text-xl text-arang tracking-wide">Daftar Peserta ({competition._count.registrations})</CardTitle>
+            <CardTitle className="font-anton text-xl text-arang tracking-tight">Daftar Peserta ({competition._count.registrations})</CardTitle>
           </CardHeader>
           <CardContent>
             {competition.registrations.length === 0 ? (
