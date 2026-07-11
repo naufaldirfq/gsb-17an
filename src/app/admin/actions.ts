@@ -402,5 +402,27 @@ export async function editCompetitionAction(competitionId: string, formData: For
   }
 }
 
+export async function updateAnnouncementSettingAction(show: boolean) {
+  const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
+  if (authCookie?.value !== "authenticated") {
+    return { error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.setting.upsert({
+      where: { key: "showLineupAnnouncement" },
+      update: { value: show ? "true" : "false" },
+      create: { key: "showLineupAnnouncement", value: show ? "true" : "false" },
+    });
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (err) {
+    console.error(err);
+    return { error: "Gagal memperbarui pengaturan" };
+  }
+}
+
 
 
