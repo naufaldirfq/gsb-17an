@@ -10,6 +10,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { AddCompetitionModal } from "./add-competition-modal";
 import { Printer } from "lucide-react";
+import { DeleteButton } from "./delete-button";
+import { deleteCompetitionAction } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -70,9 +72,17 @@ export default async function AdminDashboardPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Link href={`/admin/lomba/${comp.slug}`} className="inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all h-8 px-2.5 w-full bg-merah hover:bg-merah-tua text-white">
+                <Link href={`/admin/lomba/${comp.slug}`} className="flex-1 inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all h-8 px-2.5 bg-merah hover:bg-merah-tua text-white">
                   Kelola
                 </Link>
+                <DeleteButton
+                  id={comp.id}
+                  action={deleteCompetitionAction}
+                  confirmMessage={`Apakah Anda yakin ingin menghapus perlombaan "${comp.name}"? Semua data pendaftaran, tim, dan pertandingan yang terkait akan dihapus secara permanen.`}
+                  size="sm"
+                  variant="outline"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer h-8 w-8 p-0"
+                />
               </div>
             </CardContent>
           </Card>
