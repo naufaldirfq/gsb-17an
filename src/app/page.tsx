@@ -12,6 +12,11 @@ export default async function Home() {
     orderBy: { createdAt: "desc" },
   });
 
+  const setting = await prisma.setting.findUnique({
+    where: { key: "showLineupAnnouncement" },
+  });
+  const showLineupAnnouncement = setting ? setting.value === "true" : true;
+
   return (
     <main className="flex flex-col items-center w-full min-h-screen relative overflow-hidden">
       <BuntingStrip />
@@ -49,12 +54,14 @@ export default async function Home() {
                 ))}
               </ul>
             </CardContent>
-            <CardFooter className="flex flex-col items-center gap-1 text-center bg-arang/[0.02] border-t border-border py-4 px-5">
-              <p className="text-xs font-semibold text-merah tracking-wider uppercase">📢 Lineup Belum Final</p>
-              <p className="text-xs text-arang/70 leading-relaxed font-jakarta">
-                Daftar di atas adalah lomba yang saat ini dibuka untuk pendaftaran. Nantikan kehadiran lomba seru lainnya yang akan segera menyusul!
-              </p>
-            </CardFooter>
+            {showLineupAnnouncement && (
+              <CardFooter className="flex flex-col items-center gap-1 text-center bg-arang/[0.02] border-t border-border py-4 px-5">
+                <p className="text-xs font-semibold text-merah tracking-wider uppercase">📢 Lineup Belum Final</p>
+                <p className="text-xs text-arang/70 leading-relaxed font-jakarta">
+                  Daftar di atas adalah lomba yang saat ini dibuka untuk pendaftaran. Nantikan kehadiran lomba seru lainnya yang akan segera menyusul!
+                </p>
+              </CardFooter>
+            )}
           </Card>
         )}
 
