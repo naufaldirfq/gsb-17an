@@ -4,16 +4,22 @@ import { useTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { generateBracketAction } from "./actions";
+import { generateBracketAction, generateKnockoutBracketAction } from "./actions";
 
 export function BracketActions({
   competitionId,
   status,
   hasCompletedMatches,
+  bracketFormat,
+  hasKnockoutMatches,
+  allGroupMatchesCompleted,
 }: {
   competitionId: string;
   status: string;
   hasCompletedMatches: boolean;
+  bracketFormat: string;
+  hasKnockoutMatches: boolean;
+  allGroupMatchesCompleted: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [leftovers, setLeftovers] = useState<string[] | null>(null);
@@ -50,19 +56,43 @@ export function BracketActions({
     runGeneration();
   };
 
+  const handleStartKnockout = () => {
+    if (!confirm("Mulai babak gugur sekarang? Standings grup akan dikunci dan bagan eliminasi akan dibuat.")) return;
+    startTransition(async () => {
+      const result = await generateKnockoutBracketAction(competitionId);
+      if (result?.error) {
+        alert(result.error);
+      } else {
+        alert("Babak gugur berhasil dibuat!");
+      }
+    });
+  };
+
   if (status === "REGISTRATION") return null;
 
   const isLocked = status === "LOCKED";
   const buttonText = isLocked ? "Acak Tim & Buat Bagan" : "Regenerasi Bagan 🔄";
 
+  const showKnockoutBtn = bracketFormat === "GROUP_KNOCKOUT" && !hasKnockoutMatches && allGroupMatchesCompleted;
+
   return (
-    <>
+    <div className="flex gap-2">
+      {showKnockoutBtn && (
+        <Button
+          onClick={handleStartKnockout}
+          disabled={isPending}
+          className="bg-emas hover:bg-emas/90 text-white font-bold cursor-pointer"
+        >
+          {isPending ? "Memproses..." : "Mulai Babak Gugur 🏆"}
+        </Button>
+      )}
+
       <Button 
         onClick={handleGenerate} 
-        disabled={isPending || hasCompletedMatches}
+        disabled={isPending || (bracketFormat === "GROUP_KNOCKOUT" && hasCompletedMatches)}
         variant={isLocked ? "default" : "outline"}
         className={
-          hasCompletedMatches 
+          (bracketFormat === "GROUP_KNOCKOUT" && hasCompletedMatches)
             ? "border-gray-300 text-gray-400 font-bold cursor-not-allowed"
             : isLocked 
               ? "bg-merah hover:bg-merah-tua text-putih-kertas font-bold cursor-pointer" 
@@ -146,6 +176,6 @@ export function BracketActions({
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, MapPinIcon } from "lucide-react";
+import { getStandingsForCompetition } from "@/app/admin/(guarded)/lomba/[slug]/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,18 @@ export default async function PublicBracketPage({
     notFound();
   }
 
+  const isGroupKnockout = competition.bracketFormat === "GROUP_KNOCKOUT";
+  const isRoundRobin = competition.bracketFormat === "ROUND_ROBIN";
+
+  const groupMatches = competition.matches.filter(m => m.label && (m.label.startsWith("Grup") || m.label === "Round Robin"));
+  const knockoutMatches = competition.matches.filter(m => !m.label || (!m.label.startsWith("Grup") && m.label !== "Round Robin"));
+
   const hasMatches = competition.matches.length > 0;
+  const hasKnockoutMatches = knockoutMatches.length > 0;
+
+  const standings = (isGroupKnockout || isRoundRobin) && hasMatches
+    ? await getStandingsForCompetition(competition.id)
+    : null;
 
   if (!hasMatches) {
     return (
@@ -56,8 +68,7 @@ export default async function PublicBracketPage({
     );
   }
 
-  // Group matches by round
-  const matchesByRound = competition.matches.reduce((acc, match) => {
+  const matchesByRound = (isGroupKnockout || isRoundRobin ? knockoutMatches : competition.matches).reduce((acc, match) => {
     if (!acc[match.round]) {
       acc[match.round] = [];
     }
@@ -79,10 +90,126 @@ export default async function PublicBracketPage({
           </div>
         </div>
 
+        {standings && (
+          <div className="space-y-6">
+            <h2 className="font-anton text-2xl text-arang tracking-wide">Klasemen Sementara</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Object.entries(standings).map(([groupName, groupStandings]) => (
+                <div key={groupName} className="border border-border rounded-lg overflow-hidden bg-surface">
+                  <div className="bg-arang/5 px-4 py-2 border-b border-border font-bold text-sm text-arang">
+                    {isGroupKnockout ? `Grup ${groupName}` : "Klasemen Liga"}
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm border-collapse text-left">
+                      <thead>
+                        <tr className="border-b border-border bg-arang/5 text-xs text-arang/60 font-semibold font-jetbrains">
+                          <th className="py-2 px-3 text-center">Pos</th>
+                          <th className="py-2 px-3">Tim</th>
+                          <th className="py-2 px-3 text-center">P</th>
+                          <th className="py-2 px-3 text-center">M</th>
+                          <th className="py-2 px-3 text-center">K</th>
+                          <th className="py-2 px-3 text-center">+/-</th>
+                          <th className="py-2 px-3 text-center">PTS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {groupStandings.map((row, idx) => (
+                          <tr key={row.team.id} className={`border-b border-border last:border-0 ${idx < 2 && isGroupKnockout ? "bg-emas/5" : ""}`}>
+                            <td className="py-2 px-3 text-center font-bold">{idx + 1}</td>
+                            <td className="py-2 px-3 font-medium text-arang">
+                              {row.team.name}
+                              {idx < 2 && isGroupKnockout && (
+                                <span className="ml-2 bg-emas/10 text-emas border border-emas/20 rounded px-1 py-0.5 text-[9px] font-bold font-jetbrains">Lolos</span>
+                              )}
+                            </td>
+                            <td className="py-2 px-3 text-center font-jetbrains">{row.played}</td>
+                            <td className="py-2 px-3 text-center font-jetbrains text-green-600 font-semibold">{row.won}</td>
+                            <td className="py-2 px-3 text-center font-jetbrains text-red-600 font-semibold">{row.lost}</td>
+                            <td className="py-2 px-3 text-center font-jetbrains font-bold">
+                              {row.scoreFor - row.scoreAgainst >= 0 ? `+${row.scoreFor - row.scoreAgainst}` : row.scoreFor - row.scoreAgainst}
+                            </td>
+                            <td className="py-2 px-3 text-center font-jetbrains font-bold text-arang">{row.points}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Group matches list */}
+        {(isGroupKnockout || isRoundRobin) && groupMatches.length > 0 && (
+          <div className="space-y-6">
+            <h2 className="font-anton text-2xl text-arang tracking-wide">Pertandingan Babak Grup</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {groupMatches.map(match => (
+                <Card key={match.id} className="border-border bg-surface overflow-hidden hover:shadow-md transition-shadow">
+                  <CardContent className="p-0">
+                    <div className="flex flex-col">
+                      <div className="bg-arang/5 px-4 py-2 flex justify-between items-center border-b border-border">
+                        <span className="text-xs font-jetbrains font-bold text-arang/60">
+                          {match.label} • Ronde {match.round}
+                        </span>
+                        <Badge variant={match.status === "COMPLETED" ? "default" : match.status === "BYE" ? "secondary" : "outline"} className={match.status === "COMPLETED" ? "bg-merah hover:bg-merah-tua" : ""}>
+                          {match.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="p-4 space-y-3">
+                        <div className={`flex justify-between items-center p-2 rounded ${match.winnerTeamId === match.teamAId ? 'bg-emas/20 border border-emas/50' : 'bg-transparent'}`}>
+                          <span className={`font-medium ${match.teamA ? 'text-arang' : 'text-arang/40'}`}>
+                            {match.teamA?.name || "TBD"}
+                          </span>
+                          <span className="font-jetbrains font-bold text-lg">
+                            {match.scoreA !== null ? match.scoreA : '-'}
+                          </span>
+                        </div>
+                        
+                        <div className={`flex justify-between items-center p-2 rounded ${match.winnerTeamId === match.teamBId ? 'bg-emas/20 border border-emas/50' : 'bg-transparent'}`}>
+                          <span className={`font-medium ${match.teamB ? 'text-arang' : 'text-arang/40'}`}>
+                            {match.teamB?.name || "TBD"}
+                          </span>
+                          <span className="font-jetbrains font-bold text-lg">
+                            {match.scoreB !== null ? match.scoreB : '-'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {(match.court || match.scheduledAt) && (
+                        <div className="bg-arang/5 px-4 py-2 flex gap-4 border-t border-border text-xs text-arang/70">
+                          {match.scheduledAt && (
+                            <div className="flex items-center gap-1">
+                              <CalendarIcon className="w-3 h-3" />
+                              <span>{match.scheduledAt.toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" })}</span>
+                            </div>
+                          )}
+                          {match.court && (
+                            <div className="flex items-center gap-1">
+                              <MapPinIcon className="w-3 h-3" />
+                              <span>{match.court}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col gap-12">
+          {rounds.length > 0 && (isGroupKnockout ? hasKnockoutMatches : true) && (
+            <h2 className="font-anton text-2xl text-arang tracking-wide">
+              {isGroupKnockout ? "Bagan Babak Gugur" : "Bagan Pertandingan"}
+            </h2>
+          )}
           {rounds.map(round => {
             const matches = matchesByRound[round];
-            // Get label from first match or fallback
             const roundLabel = matches[0].label || `Round ${round}`;
             
             return (
@@ -97,7 +224,6 @@ export default async function PublicBracketPage({
                     <Card key={match.id} className="border-border bg-surface overflow-hidden hover:shadow-md transition-shadow">
                       <CardContent className="p-0">
                         <div className="flex flex-col">
-                          {/* Match Header */}
                           <div className="bg-arang/5 px-4 py-2 flex justify-between items-center border-b border-border">
                             <span className="text-xs font-jetbrains font-bold text-arang/60">
                               Match {match.position + 1}
@@ -107,9 +233,7 @@ export default async function PublicBracketPage({
                             </Badge>
                           </div>
                           
-                          {/* Teams */}
                           <div className="p-4 space-y-3">
-                            {/* Team A */}
                             <div className={`flex justify-between items-center p-2 rounded ${match.winnerTeamId === match.teamAId ? 'bg-emas/20 border border-emas/50' : 'bg-transparent'}`}>
                               <span className={`font-medium ${match.teamA ? 'text-arang' : 'text-arang/40'}`}>
                                 {match.teamA?.name || "TBD"}
@@ -119,7 +243,6 @@ export default async function PublicBracketPage({
                               </span>
                             </div>
                             
-                            {/* Team B */}
                             <div className={`flex justify-between items-center p-2 rounded ${match.winnerTeamId === match.teamBId ? 'bg-emas/20 border border-emas/50' : 'bg-transparent'}`}>
                               <span className={`font-medium ${match.teamB ? 'text-arang' : 'text-arang/40'}`}>
                                 {match.teamB?.name || "TBD"}
@@ -130,7 +253,6 @@ export default async function PublicBracketPage({
                             </div>
                           </div>
                           
-                          {/* Footer with Court/Schedule - Display schedule on Public Bracket if they exist */}
                           {(match.court || match.scheduledAt) && (
                             <div className="bg-arang/5 px-4 py-2 flex gap-4 border-t border-border text-xs text-arang/70">
                               {match.scheduledAt && (

@@ -66,6 +66,7 @@ model Team {
   competitionId String
   name          String // auto: "Tim 1" or "Budi & Andi"
   seed          Int?
+  group         String?      // "A", "B", "C", "D" etc. for group stage
   competition   Competition  @relation(fields: [competitionId], references: [id])
   members       TeamMember[]
   matchesAsA    Match[]      @relation("TeamA")

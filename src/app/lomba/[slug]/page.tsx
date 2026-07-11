@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { RegistrationForm } from "@/components/registration-form";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { WhatsAppShare } from "./whatsapp-share";
+import { getStandingsForCompetition } from "@/app/admin/(guarded)/lomba/[slug]/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +50,16 @@ export default async function LombaDetail({
   const isFull = competition.maxParticipants && competition._count.registrations >= competition.maxParticipants;
   const isOpen = competition.registrationOpen && competition.status === "REGISTRATION";
   const canRegister = isOpen && !isFull;
+
+  const isGroupKnockout = competition.bracketFormat === "GROUP_KNOCKOUT";
+  const isRoundRobin = competition.bracketFormat === "ROUND_ROBIN";
+
+  const groupMatches = competition.matches.filter(m => m.label && (m.label.startsWith("Grup") || m.label === "Round Robin"));
+  const knockoutMatches = competition.matches.filter(m => !m.label || (!m.label.startsWith("Grup") && m.label !== "Round Robin"));
+
+  const standings = (isGroupKnockout || isRoundRobin) && competition.matches.length > 0
+    ? await getStandingsForCompetition(competition.id)
+    : null;
 
   return (
     <main className="flex flex-col items-center w-full min-h-screen px-6 py-12">
@@ -113,6 +124,58 @@ export default async function LombaDetail({
           </CardContent>
         </Card>
 
+        {standings && (
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-anton text-xl text-arang tracking-wide">Klasemen Sementara</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {Object.entries(standings).map(([groupName, groupStandings]) => (
+                <div key={groupName} className="border border-border rounded-lg overflow-hidden bg-surface">
+                  <div className="bg-arang/5 px-4 py-2 border-b border-border font-bold text-sm text-arang">
+                    {competition.bracketFormat === "GROUP_KNOCKOUT" ? `Grup ${groupName}` : "Klasemen Liga"}
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm border-collapse text-left">
+                      <thead>
+                        <tr className="border-b border-border bg-arang/5 text-xs text-arang/60 font-semibold font-jetbrains">
+                          <th className="py-2 px-3 text-center">Pos</th>
+                          <th className="py-2 px-3">Tim</th>
+                          <th className="py-2 px-3 text-center">P</th>
+                          <th className="py-2 px-3 text-center">M</th>
+                          <th className="py-2 px-3 text-center">K</th>
+                          <th className="py-2 px-3 text-center">+/-</th>
+                          <th className="py-2 px-3 text-center">PTS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {groupStandings.map((row, idx) => (
+                          <tr key={row.team.id} className={`border-b border-border last:border-0 ${idx < 2 && competition.bracketFormat === "GROUP_KNOCKOUT" ? "bg-emas/5" : ""}`}>
+                            <td className="py-2 px-3 text-center font-bold">{idx + 1}</td>
+                            <td className="py-2 px-3 font-medium text-arang">
+                              {row.team.name}
+                              {idx < 2 && competition.bracketFormat === "GROUP_KNOCKOUT" && (
+                                <span className="ml-2 bg-emas/10 text-emas border border-emas/20 rounded px-1 py-0.5 text-[9px] font-bold font-jetbrains">Lolos</span>
+                              )}
+                            </td>
+                            <td className="py-2 px-3 text-center font-jetbrains">{row.played}</td>
+                            <td className="py-2 px-3 text-center font-jetbrains text-green-600 font-semibold">{row.won}</td>
+                            <td className="py-2 px-3 text-center font-jetbrains text-red-600 font-semibold">{row.lost}</td>
+                            <td className="py-2 px-3 text-center font-jetbrains font-bold">
+                              {row.scoreFor - row.scoreAgainst >= 0 ? `+${row.scoreFor - row.scoreAgainst}` : row.scoreFor - row.scoreAgainst}
+                            </td>
+                            <td className="py-2 px-3 text-center font-jetbrains font-bold text-arang">{row.points}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="border-border">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="font-anton text-xl text-arang tracking-wide">Jadwal & Hasil</CardTitle>
@@ -124,35 +187,114 @@ export default async function LombaDetail({
             {competition.matches && competition.matches.filter(m => m.status !== "BYE").length === 0 ? (
               <p className="text-sm text-arang/60 text-center py-4">Belum ada pertandingan dijadwalkan.</p>
             ) : (
-              <div className="flex flex-col gap-3">
-                {competition.matches
-                  .filter((m) => m.status !== "BYE")
-                  .map((match) => (
-                    <div key={match.id} className="p-3 border border-border rounded-lg bg-surface flex flex-col gap-2">
-                      <div className="flex justify-between items-center text-xs text-arang/60 font-semibold font-jetbrains">
-                        <span>{match.label || `Ronde ${match.round}`}</span>
-                        <span>Match {match.position + 1}</span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center text-sm">
-                        <span className={match.winnerTeamId === match.teamAId ? 'font-bold text-merah' : 'text-arang'}>
-                          {match.teamA?.name || "TBD"}
-                        </span>
-                        <span className="text-xs font-bold text-arang/40">VS</span>
-                        <span className={match.winnerTeamId === match.teamBId ? 'font-bold text-merah' : 'text-arang'}>
-                          {match.teamB?.name || "TBD"}
-                        </span>
-                      </div>
+              <div className="flex flex-col gap-5">
+                {/* Group stage matches list */}
+                {(isGroupKnockout || isRoundRobin) && groupMatches.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-arang/50 px-1">Pertandingan Babak Grup</h3>
+                    <div className="flex flex-col gap-3">
+                      {groupMatches
+                        .filter((m) => m.status !== "BYE")
+                        .map((match) => (
+                          <div key={match.id} className="p-3 border border-border rounded-lg bg-surface flex flex-col gap-2">
+                            <div className="flex justify-between items-center text-xs text-arang/60 font-semibold font-jetbrains">
+                              <span>{match.label}</span>
+                              <span>Ronde {match.round}</span>
+                            </div>
+                            
+                            <div className="flex justify-between items-center text-sm">
+                              <span className={match.winnerTeamId === match.teamAId ? 'font-bold text-merah' : 'text-arang'}>
+                                {match.teamA?.name || "TBD"}
+                              </span>
+                              <span className="text-xs font-bold text-arang/40">VS</span>
+                              <span className={match.winnerTeamId === match.teamBId ? 'font-bold text-merah' : 'text-arang'}>
+                                {match.teamB?.name || "TBD"}
+                              </span>
+                            </div>
 
-                      {(match.court || match.scheduledAt) && (
-                        <div className="text-xs text-arang/60 mt-1 font-medium bg-arang/5 py-0.5 px-1.5 rounded inline-block self-start">
-                          {match.court || ""}
-                          {match.court && match.scheduledAt && " • "}
-                          {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
-                        </div>
-                      )}
+                            {(match.court || match.scheduledAt) && (
+                              <div className="text-xs text-arang/60 mt-1 font-medium bg-arang/5 py-0.5 px-1.5 rounded inline-block self-start">
+                                {match.court || ""}
+                                {match.court && match.scheduledAt && " • "}
+                                {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* Knockout stage matches list */}
+                {isGroupKnockout && knockoutMatches.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-arang/50 px-1">Pertandingan Babak Gugur</h3>
+                    <div className="flex flex-col gap-3">
+                      {knockoutMatches
+                        .filter((m) => m.status !== "BYE")
+                        .map((match) => (
+                          <div key={match.id} className="p-3 border border-border rounded-lg bg-surface flex flex-col gap-2">
+                            <div className="flex justify-between items-center text-xs text-arang/60 font-semibold font-jetbrains">
+                              <span>{match.label || `Ronde ${match.round}`}</span>
+                              <span>Match {match.position + 1}</span>
+                            </div>
+                            
+                            <div className="flex justify-between items-center text-sm">
+                              <span className={match.winnerTeamId === match.teamAId ? 'font-bold text-merah' : 'text-arang'}>
+                                {match.teamA?.name || "TBD"}
+                              </span>
+                              <span className="text-xs font-bold text-arang/40">VS</span>
+                              <span className={match.winnerTeamId === match.teamBId ? 'font-bold text-merah' : 'text-arang'}>
+                                {match.teamB?.name || "TBD"}
+                              </span>
+                            </div>
+
+                            {(match.court || match.scheduledAt) && (
+                              <div className="text-xs text-arang/60 mt-1 font-medium bg-arang/5 py-0.5 px-1.5 rounded inline-block self-start">
+                                {match.court || ""}
+                                {match.court && match.scheduledAt && " • "}
+                                {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Standard matches list for Single Elimination */}
+                {!isGroupKnockout && !isRoundRobin && (
+                  <div className="flex flex-col gap-3">
+                    {competition.matches
+                      .filter((m) => m.status !== "BYE")
+                      .map((match) => (
+                        <div key={match.id} className="p-3 border border-border rounded-lg bg-surface flex flex-col gap-2">
+                          <div className="flex justify-between items-center text-xs text-arang/60 font-semibold font-jetbrains">
+                            <span>{match.label || `Ronde ${match.round}`}</span>
+                            <span>Match {match.position + 1}</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center text-sm">
+                            <span className={match.winnerTeamId === match.teamAId ? 'font-bold text-merah' : 'text-arang'}>
+                              {match.teamA?.name || "TBD"}
+                            </span>
+                            <span className="text-xs font-bold text-arang/40">VS</span>
+                            <span className={match.winnerTeamId === match.teamBId ? 'font-bold text-merah' : 'text-arang'}>
+                              {match.teamB?.name || "TBD"}
+                            </span>
+                          </div>
+
+                          {(match.court || match.scheduledAt) && (
+                            <div className="text-xs text-arang/60 mt-1 font-medium bg-arang/5 py-0.5 px-1.5 rounded inline-block self-start">
+                              {match.court || ""}
+                              {match.court && match.scheduledAt && " • "}
+                              {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             )}
           </CardContent>

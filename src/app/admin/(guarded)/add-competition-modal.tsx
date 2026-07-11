@@ -109,6 +109,7 @@ export function AddCompetitionModal() {
                 <SelectContent className="bg-white">
                   <SelectItem value="SINGLE_ELIM">Single Elimination</SelectItem>
                   <SelectItem value="ROUND_ROBIN">Round Robin</SelectItem>
+                  <SelectItem value="GROUP_KNOCKOUT">Group + Knockout</SelectItem>
                 </SelectContent>
               </Select>
             </div>

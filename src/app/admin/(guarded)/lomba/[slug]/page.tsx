@@ -15,6 +15,7 @@ import { MatchScoreModal } from "./match-score-modal";
 import { MatchScheduleModal } from "./match-schedule-modal";
 import { DeleteButton } from "@/app/admin/(guarded)/delete-button";
 import { deleteRegistrationAction } from "@/app/admin/actions";
+import { getStandingsForCompetition } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +57,20 @@ export default async function CompetitionManagePage({
   const isOngoing = comp.status === "ONGOING" || comp.status === "DONE";
   const hasCompletedMatches = comp.matches.some(m => m.status === "COMPLETED");
 
+  const isGroupKnockout = comp.bracketFormat === "GROUP_KNOCKOUT";
+  const isRoundRobin = comp.bracketFormat === "ROUND_ROBIN";
+
+  const groupMatches = comp.matches.filter(m => m.label && (m.label.startsWith("Grup") || m.label === "Round Robin"));
+  const knockoutMatches = comp.matches.filter(m => !m.label || (!m.label.startsWith("Grup") && m.label !== "Round Robin"));
+
+  const hasKnockoutMatches = knockoutMatches.length > 0;
+  const allGroupMatchesCompleted = groupMatches.length > 0 && groupMatches.every(m => m.status === "COMPLETED");
+
+  // Fetch standings if group/round-robin format and matches are generated
+  const standings = (isGroupKnockout || isRoundRobin) && comp.matches.length > 0
+    ? await getStandingsForCompetition(comp.id)
+    : null;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-4">
@@ -71,7 +86,14 @@ export default async function CompetitionManagePage({
             isRegistration={isRegistration} 
             hasMatches={comp.matches.length > 0} 
           />
-          <BracketActions competitionId={comp.id} status={comp.status} hasCompletedMatches={hasCompletedMatches} />
+          <BracketActions 
+            competitionId={comp.id} 
+            status={comp.status} 
+            hasCompletedMatches={hasCompletedMatches} 
+            bracketFormat={comp.bracketFormat}
+            hasKnockoutMatches={hasKnockoutMatches}
+            allGroupMatchesCompleted={allGroupMatchesCompleted}
+          />
         </div>
       </div>
 
@@ -128,6 +150,7 @@ export default async function CompetitionManagePage({
               <TableHeader>
                 <TableRow>
                   <TableHead>Nama Tim</TableHead>
+                  {isGroupKnockout && <TableHead>Grup</TableHead>}
                   <TableHead>Anggota</TableHead>
                 </TableRow>
               </TableHeader>
@@ -135,6 +158,11 @@ export default async function CompetitionManagePage({
                 {comp.teams.map(team => (
                   <TableRow key={team.id}>
                     <TableCell className="font-medium">{team.name}</TableCell>
+                    {isGroupKnockout && (
+                      <TableCell>
+                        <Badge variant="secondary">Grup {team.group || "-"}</Badge>
+                      </TableCell>
+                    )}
                     <TableCell>
                       {team.members.map(m => m.registration.participant.name).join(", ")}
                     </TableCell>
@@ -144,60 +172,228 @@ export default async function CompetitionManagePage({
             </Table>
           </div>
 
-          <div className="bg-white rounded-lg shadow border border-gray-200">
-            <div className="p-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-arang">Daftar Pertandingan (Bagan)</h2>
-            </div>
-            <Table>
-               <TableHeader>
-                <TableRow>
-                  <TableHead>Ronde</TableHead>
-                  <TableHead>Posisi</TableHead>
-                  <TableHead>Tim A</TableHead>
-                  <TableHead>Tim B</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Jadwal</TableHead>
-                  <TableHead>Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {comp.matches.map(match => (
-                  <TableRow key={match.id}>
-                    <TableCell>{match.label || `Ronde ${match.round}`}</TableCell>
-                    <TableCell>Match {match.position + 1}</TableCell>
-                    <TableCell>{match.teamA?.name || "-"}</TableCell>
-                    <TableCell>{match.teamB?.name || "-"}</TableCell>
-                    <TableCell>
-                      <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
-                        {match.status}
-                      </Badge>
-                      {match.winnerTeam && <span className="ml-2 text-sm text-green-600">Pemenang: {match.winnerTeam.name}</span>}
-                    </TableCell>
-                    <TableCell>
-                      {match.court || match.scheduledAt ? (
-                        <div className="text-xs">
-                          <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
-                          <p className="text-gray-500">
-                            {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
-                          </p>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {match.status !== "BYE" && (
-                        <div className="flex gap-2">
-                          <MatchScheduleModal match={match} />
-                          <MatchScoreModal match={match} />
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
+          {standings && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-arang">Klasemen Babak Grup</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Object.entries(standings).map(([groupName, groupStandings]) => (
+                  <div key={groupName} className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                    <div className="p-4 bg-arang/5 border-b border-gray-200">
+                      <h3 className="font-bold text-arang">
+                        {isGroupKnockout ? `Grup ${groupName}` : "Round Robin"}
+                      </h3>
+                    </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[50px] text-center">Pos</TableHead>
+                          <TableHead>Tim</TableHead>
+                          <TableHead className="text-center">P</TableHead>
+                          <TableHead className="text-center">M</TableHead>
+                          <TableHead className="text-center">K</TableHead>
+                          <TableHead className="text-center">+/-</TableHead>
+                          <TableHead className="text-center">PTS</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {groupStandings.map((row, idx) => (
+                          <TableRow key={row.team.id} className={idx < 2 && isGroupKnockout ? "bg-emas/5" : ""}>
+                            <TableCell className="text-center font-bold">{idx + 1}</TableCell>
+                            <TableCell className="font-medium">
+                              {row.team.name}
+                              {idx < 2 && isGroupKnockout && (
+                                <Badge variant="outline" className="ml-2 text-emas border-emas bg-emas/10 text-[10px] px-1 py-0 font-jetbrains font-bold">Lolos</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-center font-jetbrains">{row.played}</TableCell>
+                            <TableCell className="text-center font-jetbrains text-green-600 font-semibold">{row.won}</TableCell>
+                            <TableCell className="text-center font-jetbrains text-red-600 font-semibold">{row.lost}</TableCell>
+                            <TableCell className="text-center font-jetbrains font-bold">
+                              {row.scoreFor - row.scoreAgainst >= 0 ? `+${row.scoreFor - row.scoreAgainst}` : row.scoreFor - row.scoreAgainst}
+                            </TableCell>
+                            <TableCell className="text-center font-jetbrains font-bold text-arang">{row.points}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
-          </div>
+              </div>
+            </div>
+          )}
+
+          {/* Group matches list */}
+          {(isGroupKnockout || isRoundRobin) && groupMatches.length > 0 && (
+            <div className="bg-white rounded-lg shadow border border-gray-200">
+              <div className="p-4 border-b border-gray-200">
+                <h2 className="text-xl font-semibold text-arang">Daftar Pertandingan Babak Grup</h2>
+              </div>
+              <Table>
+                 <TableHeader>
+                  <TableRow>
+                    <TableHead>Grup</TableHead>
+                    <TableHead>Ronde</TableHead>
+                    <TableHead>Tim A</TableHead>
+                    <TableHead>Tim B</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Jadwal</TableHead>
+                    <TableHead>Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {groupMatches.map(match => (
+                    <TableRow key={match.id}>
+                      <TableCell><Badge variant="secondary">{match.label}</Badge></TableCell>
+                      <TableCell>Ronde {match.round}</TableCell>
+                      <TableCell>{match.teamA?.name || "-"}</TableCell>
+                      <TableCell>{match.teamB?.name || "-"}</TableCell>
+                      <TableCell>
+                        <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
+                          {match.status}
+                        </Badge>
+                        {match.winnerTeam && <span className="ml-2 text-sm text-green-600 font-semibold">Pemenang: {match.winnerTeam.name}</span>}
+                      </TableCell>
+                      <TableCell>
+                        {match.court || match.scheduledAt ? (
+                          <div className="text-xs">
+                            <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
+                            <p className="text-gray-500">
+                              {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {match.status !== "BYE" && (
+                          <div className="flex gap-2">
+                            <MatchScheduleModal match={match} />
+                            <MatchScoreModal match={match} />
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+
+          {/* Knockout matches list / Standard Matches List */}
+          {(!isGroupKnockout && !isRoundRobin) ? (
+            <div className="bg-white rounded-lg shadow border border-gray-200">
+              <div className="p-4 border-b border-gray-200">
+                <h2 className="text-xl font-semibold text-arang">Daftar Pertandingan (Bagan)</h2>
+              </div>
+              <Table>
+                 <TableHeader>
+                  <TableRow>
+                    <TableHead>Ronde</TableHead>
+                    <TableHead>Posisi</TableHead>
+                    <TableHead>Tim A</TableHead>
+                    <TableHead>Tim B</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Jadwal</TableHead>
+                    <TableHead>Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {comp.matches.map(match => (
+                    <TableRow key={match.id}>
+                      <TableCell>{match.label || `Ronde ${match.round}`}</TableCell>
+                      <TableCell>Match {match.position + 1}</TableCell>
+                      <TableCell>{match.teamA?.name || "-"}</TableCell>
+                      <TableCell>{match.teamB?.name || "-"}</TableCell>
+                      <TableCell>
+                        <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
+                          {match.status}
+                        </Badge>
+                        {match.winnerTeam && <span className="ml-2 text-sm text-green-600 font-semibold">Pemenang: {match.winnerTeam.name}</span>}
+                      </TableCell>
+                      <TableCell>
+                        {match.court || match.scheduledAt ? (
+                          <div className="text-xs">
+                            <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
+                            <p className="text-gray-500">
+                              {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {match.status !== "BYE" && (
+                          <div className="flex gap-2">
+                            <MatchScheduleModal match={match} />
+                            <MatchScoreModal match={match} />
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            isGroupKnockout && hasKnockoutMatches && (
+              <div className="bg-white rounded-lg shadow border border-gray-200">
+                <div className="p-4 border-b border-gray-200">
+                  <h2 className="text-xl font-semibold text-arang">Daftar Pertandingan Babak Gugur</h2>
+                </div>
+                <Table>
+                   <TableHeader>
+                    <TableRow>
+                      <TableHead>Ronde</TableHead>
+                      <TableHead>Posisi</TableHead>
+                      <TableHead>Tim A</TableHead>
+                      <TableHead>Tim B</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Jadwal</TableHead>
+                      <TableHead>Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {knockoutMatches.map(match => (
+                      <TableRow key={match.id}>
+                        <TableCell>{match.label || `Ronde ${match.round}`}</TableCell>
+                        <TableCell>Match {match.position + 1}</TableCell>
+                        <TableCell>{match.teamA?.name || "-"}</TableCell>
+                        <TableCell>{match.teamB?.name || "-"}</TableCell>
+                        <TableCell>
+                          <Badge variant={match.status === "BYE" ? "secondary" : "default"}>
+                            {match.status}
+                          </Badge>
+                          {match.winnerTeam && <span className="ml-2 text-sm text-green-600 font-semibold">Pemenang: {match.winnerTeam.name}</span>}
+                        </TableCell>
+                        <TableCell>
+                          {match.court || match.scheduledAt ? (
+                            <div className="text-xs">
+                              <p className="font-semibold text-arang">{match.court || "Tanpa Lapangan"}</p>
+                              <p className="text-gray-500">
+                                {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : ""}
+                              </p>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-xs">Belum dijadwalkan</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {match.status !== "BYE" && (
+                            <div className="flex gap-2">
+                              <MatchScheduleModal match={match} />
+                              <MatchScoreModal match={match} />
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )
+          )}
         </div>
       )}
     </div>
