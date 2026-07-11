@@ -174,3 +174,8 @@ model MatchTeam {
   @@unique([matchId, teamId])
   @@index([teamId])
 }
+
+model Setting {
+  key   String @id
+  value String
+}
