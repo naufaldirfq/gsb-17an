@@ -186,7 +186,7 @@ export function AddParticipantModal({
                   required
                   value={houseBlock}
                   onChange={(e) => setHouseBlock(e.target.value)}
-                  placeholder="C3"
+                  placeholder="C"
                   disabled={!!selectedParticipant}
                 />
               </div>
@@ -197,7 +197,7 @@ export function AddParticipantModal({
                   required
                   value={houseNumber}
                   onChange={(e) => setHouseNumber(e.target.value)}
-                  placeholder="12A"
+                  placeholder="12"
                   disabled={!!selectedParticipant}
                 />
               </div>

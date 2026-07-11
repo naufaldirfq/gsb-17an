@@ -78,7 +78,7 @@ export function RegistrationForm({ competitionId }: { competitionId: string }) {
           <Label htmlFor="houseBlock" className="text-arang font-semibold">Blok Rumah</Label>
           <Input 
             id="houseBlock" 
-            placeholder="C3" 
+            placeholder="C" 
             className="border-arang/20 focus-visible:ring-merah"
             {...register("houseBlock")}
           />
@@ -90,7 +90,7 @@ export function RegistrationForm({ competitionId }: { competitionId: string }) {
           <Label htmlFor="houseNumber" className="text-arang font-semibold">Nomor</Label>
           <Input 
             id="houseNumber" 
-            placeholder="12A" 
+            placeholder="12" 
             className="border-arang/20 focus-visible:ring-merah"
             {...register("houseNumber")}
           />
