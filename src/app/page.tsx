@@ -2,7 +2,7 @@ import { BuntingStrip } from "@/components/bunting-strip";
 import { Countdown } from "@/components/countdown";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +49,12 @@ export default async function Home() {
                 ))}
               </ul>
             </CardContent>
+            <CardFooter className="flex flex-col items-center gap-1 text-center bg-arang/[0.02] border-t border-border py-4 px-5">
+              <p className="text-xs font-semibold text-merah tracking-wider uppercase">📢 Lineup Belum Final</p>
+              <p className="text-xs text-arang/70 leading-relaxed font-jakarta">
+                Daftar di atas adalah lomba yang saat ini dibuka untuk pendaftaran. Nantikan kehadiran lomba seru lainnya yang akan segera menyusul!
+              </p>
+            </CardFooter>
           </Card>
         )}
 
