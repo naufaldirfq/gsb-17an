@@ -31,6 +31,9 @@ const createCompetitionSchema = z.object({
   bracketFormat: z.nativeEnum(BracketFormat),
   maxParticipants: z.number().int().optional().nullable(),
   heatSize: z.coerce.number().min(2).optional().nullable(),
+  registrationRequired: z.boolean().default(true),
+  heldAt: z.string().optional().nullable(),
+  location: z.string().optional().nullable(),
 }).refine(data => {
   if (data.bracketFormat === "RACE_HEATS") {
     return data.heatSize !== null && data.heatSize !== undefined;
@@ -53,6 +56,10 @@ export async function createCompetitionAction(formData: FormData) {
   const heatSizeRaw = formData.get("heatSize") as string;
   const heatSize = (heatSizeRaw && heatSizeRaw.trim() !== "") ? parseInt(heatSizeRaw) : null;
   
+  const registrationRequired = formData.get("registrationRequired") === "true";
+  const heldAt = (formData.get("heldAt") as string) || null;
+  const location = (formData.get("location") as string) || null;
+  
   const parsed = createCompetitionSchema.safeParse({
     name: rawName,
     description: formData.get("description") || undefined,
@@ -62,6 +69,9 @@ export async function createCompetitionAction(formData: FormData) {
     bracketFormat: formData.get("bracketFormat"),
     maxParticipants: maxParticipantsRaw ? parseInt(maxParticipantsRaw) : null,
     heatSize,
+    registrationRequired,
+    heldAt,
+    location,
   });
 
   if (!parsed.success) {
