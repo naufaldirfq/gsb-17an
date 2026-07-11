@@ -7,9 +7,11 @@ import { closeRegistrationAction, openRegistrationAction } from "./actions";
 export function RegistrationActions({
   competitionId,
   isRegistration,
+  hasMatches,
 }: {
   competitionId: string;
   isRegistration: boolean;
+  hasMatches: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -23,6 +25,13 @@ export function RegistrationActions({
   };
 
   const handleOpen = () => {
+    if (hasMatches) {
+      const confirmOpen = confirm(
+        "Membuka kembali pendaftaran akan menghapus bagan dan semua tim yang sudah terbentuk. Lanjutkan?"
+      );
+      if (!confirmOpen) return;
+    }
+
     startTransition(async () => {
       const result = await openRegistrationAction(competitionId);
       if (result?.error) {

@@ -66,7 +66,11 @@ export default async function CompetitionManagePage({
           </p>
         </div>
         <div className="flex gap-4">
-          <RegistrationActions competitionId={comp.id} isRegistration={isRegistration} />
+          <RegistrationActions 
+            competitionId={comp.id} 
+            isRegistration={isRegistration} 
+            hasMatches={comp.matches.length > 0} 
+          />
           <BracketActions competitionId={comp.id} status={comp.status} hasCompletedMatches={hasCompletedMatches} />
         </div>
       </div>

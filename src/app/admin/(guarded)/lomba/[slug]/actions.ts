@@ -36,10 +36,58 @@ export async function openRegistrationAction(competitionId: string) {
     const comp = await prisma.competition.findUnique({ where: { id: competitionId } });
     if (!comp) return { error: "Competition not found" };
 
-    await prisma.competition.update({
-      where: { id: competitionId },
-      data: { status: "REGISTRATION", registrationOpen: true },
+    await prisma.$transaction(async (tx) => {
+      // Find all dummy participants registered to this competition
+      const dummyRegistrations = await tx.registration.findMany({
+        where: {
+          competitionId,
+          participant: {
+            phone: {
+              startsWith: "08-PANITIA-",
+            },
+          },
+        },
+        select: {
+          id: true,
+          participantId: true,
+        },
+      });
+
+      const dummyParticipantIds = dummyRegistrations.map((r) => r.participantId);
+      const dummyRegistrationIds = dummyRegistrations.map((r) => r.id);
+
+      // Delete matches
+      await tx.match.deleteMany({ where: { competitionId } });
+
+      // Delete team members
+      await tx.teamMember.deleteMany({ where: { team: { competitionId } } });
+
+      // Delete teams
+      await tx.team.deleteMany({ where: { competitionId } });
+
+      if (dummyRegistrationIds.length > 0) {
+        // Delete registration records for dummies
+        await tx.registration.deleteMany({
+          where: {
+            id: { in: dummyRegistrationIds },
+          },
+        });
+
+        // Delete dummy participants
+        await tx.participant.deleteMany({
+          where: {
+            id: { in: dummyParticipantIds },
+          },
+        });
+      }
+
+      // Reopen registration
+      await tx.competition.update({
+        where: { id: competitionId },
+        data: { status: "REGISTRATION", registrationOpen: true },
+      });
     });
+
     revalidatePath("/admin");
     revalidatePath(`/admin/lomba/[slug]`, "page");
     return { success: true };
