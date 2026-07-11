@@ -87,9 +87,11 @@ export default async function LombaDetail({
             <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
               {competition.teamSize === 1 ? "Perorangan" : `${competition.teamSize} Orang/Tim`}
             </span>
-            <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
-              Terdaftar: {competition._count.registrations} Orang
-            </span>
+            {competition.registrationRequired && (
+              <span className="bg-arang/5 text-arang px-2 py-1 rounded text-xs font-bold font-jetbrains">
+                Terdaftar: {competition._count.registrations} Orang
+              </span>
+            )}
           </div>
         </div>
 
@@ -115,20 +117,47 @@ export default async function LombaDetail({
           </Card>
         )}
 
-        <Card className="border-border">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-anton text-2xl text-arang tracking-tight">Pendaftaran</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!canRegister ? (
-              <div className="p-4 bg-merah/10 text-merah-tua rounded-lg text-sm font-medium text-center border border-merah/20">
-                {isFull ? "Maaf, kuota pendaftaran sudah penuh." : "Pendaftaran untuk lomba ini sudah ditutup."}
-              </div>
-            ) : (
-              <RegistrationForm competitionId={competition.id} />
-            )}
-          </CardContent>
-        </Card>
+        {(competition.heldAt || competition.location || !competition.registrationRequired) && (
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-anton text-xl text-arang tracking-tight">Informasi Pelaksanaan</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-arang/80">
+              {competition.heldAt && (
+                <div>
+                  <span className="font-bold text-gray-500 block text-xs uppercase font-jetbrains">Waktu & Tanggal</span>
+                  <p className="mt-0.5 font-medium text-arang">{competition.heldAt}</p>
+                </div>
+              )}
+              {competition.location && (
+                <div>
+                  <span className="font-bold text-gray-500 block text-xs uppercase font-jetbrains">Lokasi</span>
+                  <p className="mt-0.5 font-medium text-arang">{competition.location}</p>
+                </div>
+              )}
+              {!competition.heldAt && !competition.location && (
+                <p className="text-arang/60 italic">Detail waktu dan tempat akan segera diumumkan.</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {competition.registrationRequired && (
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-anton text-2xl text-arang tracking-tight">Pendaftaran</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {!canRegister ? (
+                <div className="p-4 bg-merah/10 text-merah-tua rounded-lg text-sm font-medium text-center border border-merah/20">
+                  {isFull ? "Maaf, kuota pendaftaran sudah penuh." : "Pendaftaran untuk lomba ini sudah ditutup."}
+                </div>
+              ) : (
+                <RegistrationForm competitionId={competition.id} />
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {standings && (
           <Card className="border-border">
@@ -362,30 +391,32 @@ export default async function LombaDetail({
           </CardContent>
         </Card>
 
-        <Card className="border-border">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-anton text-xl text-arang tracking-tight">Daftar Peserta ({competition._count.registrations})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {competition.registrations.length === 0 ? (
-              <p className="text-sm text-arang/60 text-center py-4">Belum ada peserta yang mendaftar.</p>
-            ) : (
-              <ul className="flex flex-col gap-3">
-                {competition.registrations.map((reg, idx) => (
-                  <li key={reg.id} className="flex justify-between items-center pb-3 border-b border-arang/5 last:border-0 last:pb-0">
-                    <div className="flex items-center gap-3">
-                      <span className="font-jetbrains text-merah/60 font-bold text-sm w-4">{idx + 1}.</span>
-                      <span className="font-medium text-arang">{reg.participant.name}</span>
-                    </div>
-                    <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
-                      Blok {reg.participant.houseBlock}-{reg.participant.houseNumber}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+        {competition.registrationRequired && (
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-anton text-xl text-arang tracking-tight">Daftar Peserta ({competition._count.registrations})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {competition.registrations.length === 0 ? (
+                <p className="text-sm text-arang/60 text-center py-4">Belum ada peserta yang mendaftar.</p>
+              ) : (
+                <ul className="flex flex-col gap-3">
+                  {competition.registrations.map((reg, idx) => (
+                    <li key={reg.id} className="flex justify-between items-center pb-3 border-b border-arang/5 last:border-0 last:pb-0">
+                      <div className="flex items-center gap-3">
+                        <span className="font-jetbrains text-merah/60 font-bold text-sm w-4">{idx + 1}.</span>
+                        <span className="font-medium text-arang">{reg.participant.name}</span>
+                      </div>
+                      <span className="text-xs bg-arang/5 px-2 py-1 rounded font-jetbrains font-bold text-arang/60">
+                        Blok {reg.participant.houseBlock}-{reg.participant.houseNumber}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
       </div>
     </main>
