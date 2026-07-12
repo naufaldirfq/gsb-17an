@@ -16,6 +16,9 @@ vi.mock("@/lib/prisma", () => {
         findUnique: vi.fn(),
         create: vi.fn(),
       },
+      setting: {
+        findUnique: vi.fn(),
+      },
       $transaction: vi.fn((cb) => cb()), // mock transaction
     },
   };
@@ -45,6 +48,11 @@ describe("registerAction", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     await resetRateLimitCacheForTesting();
+    
+    // Set default setting mock to null (defaults to July 31st 2026)
+    const prisma = (await import("@/lib/prisma")).default;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.setting.findUnique as any).mockResolvedValue(null);
   });
 
   it("should fail if competition does not exist", async () => {
@@ -135,4 +143,75 @@ describe("registerAction", () => {
   it.todo("should fail if participant already registered for the same competition");
 
   it.todo("should succeed if valid");
+
+  it("should fail if registration deadline has passed", async () => {
+    const formData = new FormData();
+    formData.append("competitionId", "any-comp");
+    formData.append("name", "Budi");
+    formData.append("houseBlock", "C3");
+    formData.append("houseNumber", "12A");
+    formData.append("phone", "08123456789");
+
+    const prisma = (await import("@/lib/prisma")).default;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.competition.findUnique as any).mockResolvedValue({
+      id: "any-comp",
+      _count: { registrations: 0 },
+      maxParticipants: null,
+      registrationOpen: true,
+      status: "REGISTRATION",
+    });
+
+    // Mock deadline setting in the past (yesterday)
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.setting.findUnique as any).mockResolvedValue({
+      key: "registrationDeadline",
+      value: yesterday,
+    });
+
+    const result = await registerAction(null, formData);
+
+    expect(result.error).toBe(true);
+    expect(result.message).toBe("Pendaftaran sudah ditutup karena telah melewati batas waktu (deadline).");
+  });
+
+  it("should succeed/continue if registration deadline is in the future", async () => {
+    const formData = new FormData();
+    formData.append("competitionId", "any-comp");
+    formData.append("name", "Budi");
+    formData.append("houseBlock", "C3");
+    formData.append("houseNumber", "12A");
+    formData.append("phone", "08123456789");
+
+    const prisma = (await import("@/lib/prisma")).default;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.competition.findUnique as any).mockResolvedValue({
+      id: "any-comp",
+      _count: { registrations: 0 },
+      maxParticipants: null,
+      registrationOpen: true,
+      status: "REGISTRATION",
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.participant.upsert as any).mockResolvedValue({ id: "p1" });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.registration.findUnique as any).mockResolvedValue(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.registration.create as any).mockResolvedValue({});
+
+    // Mock deadline setting in the future (tomorrow)
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (prisma.setting.findUnique as any).mockResolvedValue({
+      key: "registrationDeadline",
+      value: tomorrow,
+    });
+
+    const result = await registerAction(null, formData);
+
+    expect(result.error).toBe(false);
+    expect(result.message).toBe("Pendaftaran berhasil!");
+  });
 });
+

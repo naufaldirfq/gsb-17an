@@ -13,6 +13,7 @@ import { Printer } from "lucide-react";
 import { DeleteButton } from "./delete-button";
 import { deleteCompetitionAction } from "../actions";
 import { AnnouncementToggle } from "./announcement-toggle";
+import { DeadlineSettings } from "./deadline-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,11 @@ export default async function AdminDashboardPage() {
     where: { key: "showLineupAnnouncement" },
   });
   const showLineupAnnouncement = setting ? setting.value === "true" : true;
+
+  const deadlineSetting = await prisma.setting.findUnique({
+    where: { key: "registrationDeadline" },
+  });
+  const deadline = deadlineSetting?.value || "2026-07-31T23:59:59+07:00";
 
   return (
     <div className="space-y-6">
@@ -51,12 +57,14 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="max-w-xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
         <AnnouncementToggle initialShow={showLineupAnnouncement} />
+        <DeadlineSettings initialDeadline={deadline} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {competitions.map((comp) => (
+
           <Card key={comp.id} className="border-gray-200">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
@@ -81,6 +89,58 @@ export default async function AdminDashboardPage() {
                   <span className="font-semibold">{comp._count.teams}</span> Tim
                 </div>
               </div>
+
+              <div className="my-4 pt-3 border-t border-gray-100 space-y-2 text-xs">
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold text-gray-500 w-16 shrink-0">Waktu:</span>
+                  <div className="min-w-0 flex-1">
+                    {comp.heldAt ? (
+                      <span className="text-gray-700 truncate block" title={comp.heldAt}>{comp.heldAt}</span>
+                    ) : (
+                      <span className="inline-flex items-center text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                        Belum Diatur
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold text-gray-500 w-16 shrink-0">Lokasi:</span>
+                  <div className="min-w-0 flex-1">
+                    {comp.location ? (
+                      <span className="text-gray-700 truncate block" title={comp.location}>{comp.location}</span>
+                    ) : (
+                      <span className="inline-flex items-center text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                        Belum Diatur
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold text-gray-500 w-16 shrink-0">Deskripsi:</span>
+                  <div className="min-w-0 flex-1">
+                    {comp.description ? (
+                      <span className="text-gray-700 line-clamp-1" title={comp.description}>{comp.description}</span>
+                    ) : (
+                      <span className="inline-flex items-center text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                        Belum Ada
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold text-gray-500 w-16 shrink-0">Peraturan:</span>
+                  <div className="min-w-0 flex-1">
+                    {comp.rules ? (
+                      <span className="text-gray-700 line-clamp-1" title={comp.rules}>{comp.rules}</span>
+                    ) : (
+                      <span className="inline-flex items-center text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                        Belum Ada
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div className="flex gap-2">
                 <Link href={`/admin/lomba/${comp.slug}`} className="flex-1 inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all h-8 px-2.5 bg-merah hover:bg-merah-tua text-white">
                   Kelola

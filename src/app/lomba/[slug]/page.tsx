@@ -5,6 +5,7 @@ import { RegistrationForm } from "@/components/registration-form";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { WhatsAppShare } from "./whatsapp-share";
 import { getStandingsForCompetition } from "@/app/admin/(guarded)/lomba/[slug]/actions";
+import { formatIndonesianDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -52,10 +53,17 @@ export default async function LombaDetail({
     notFound();
   }
 
+  const deadlineSetting = await prisma.setting.findUnique({
+    where: { key: "registrationDeadline" },
+  });
+  const deadlineStr = deadlineSetting?.value || "2026-07-31T23:59:59+07:00";
+  const deadline = new Date(deadlineStr);
+  const isPastDeadline = new Date() > deadline;
+
   const registrationRequired = competition.registrationRequired ?? true;
   const isFull = competition.maxParticipants && competition._count.registrations >= competition.maxParticipants;
   const isOpen = competition.registrationOpen && competition.status === "REGISTRATION";
-  const canRegister = isOpen && !isFull && registrationRequired;
+  const canRegister = isOpen && !isFull && registrationRequired && !isPastDeadline;
 
   const isGroupKnockout = competition.bracketFormat === "GROUP_KNOCKOUT";
   const isRoundRobin = competition.bracketFormat === "ROUND_ROBIN";
@@ -147,11 +155,18 @@ export default async function LombaDetail({
           <Card className="border-border">
             <CardHeader className="pb-2">
               <CardTitle className="font-anton text-2xl text-arang tracking-tight">Pendaftaran</CardTitle>
+              <div className="text-xs text-arang/60 font-medium mt-1">
+                Batas Pendaftaran: <span className="font-bold text-merah">{formatIndonesianDate(deadlineStr)}</span>
+              </div>
             </CardHeader>
             <CardContent>
               {!canRegister ? (
                 <div className="p-4 bg-merah/10 text-merah-tua rounded-lg text-sm font-medium text-center border border-merah/20">
-                  {isFull ? "Maaf, kuota pendaftaran sudah penuh." : "Pendaftaran untuk lomba ini sudah ditutup."}
+                  {isPastDeadline
+                    ? "Maaf, pendaftaran sudah ditutup karena telah melewati batas waktu pendaftaran (deadline)."
+                    : isFull
+                    ? "Maaf, kuota pendaftaran sudah penuh."
+                    : "Pendaftaran untuk lomba ini sudah ditutup."}
                 </div>
               ) : (
                 <RegistrationForm competitionId={competition.id} />

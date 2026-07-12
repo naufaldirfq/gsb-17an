@@ -1,19 +1,27 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { formatIndonesianDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function LombaList() {
   const competitions = await prisma.competition.findMany({
     where: { status: { not: "DRAFT" } },
-    orderBy: { createdAt: "desc" },
+    orderBy: { name: "asc" },
     include: {
       _count: {
         select: { registrations: true },
       },
     },
   });
+
+  const deadlineSetting = await prisma.setting.findUnique({
+    where: { key: "registrationDeadline" },
+  });
+  const deadlineStr = deadlineSetting?.value || "2026-07-31T23:59:59+07:00";
+  const deadline = new Date(deadlineStr);
+  const isPastDeadline = new Date() > deadline;
 
   return (
     <main className="flex flex-col items-center w-full min-h-screen px-6 py-12">
@@ -24,6 +32,15 @@ export default async function LombaList() {
           </Link>
           <h1 className="font-anton text-4xl text-arang mt-4 tracking-wide">DAFTAR LOMBA</h1>
           <p className="text-arang/80 font-medium mt-1">Pilih lomba yang ingin Anda ikuti</p>
+
+          <div className={`border rounded-xl p-4 flex flex-col gap-1 mt-4 ${isPastDeadline ? 'bg-gray-100 border-gray-200' : 'bg-merah/5 border-merah/10'}`}>
+            <span className={`text-xs font-semibold uppercase tracking-wider font-jetbrains ${isPastDeadline ? 'text-gray-500' : 'text-merah'}`}>
+              {isPastDeadline ? "❌ Pendaftaran Telah Ditutup" : "⏳ Batas Akhir Pendaftaran"}
+            </span>
+            <span className={`text-sm font-bold ${isPastDeadline ? 'text-gray-600 line-through' : 'text-arang'}`}>
+              {formatIndonesianDate(deadlineStr)}
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -31,7 +48,7 @@ export default async function LombaList() {
             const registrationRequired = comp.registrationRequired ?? true;
             const isFull = comp.maxParticipants && comp._count.registrations >= comp.maxParticipants;
             const isOpen = comp.registrationOpen && comp.status === "REGISTRATION";
-            const canRegister = isOpen && !isFull && registrationRequired;
+            const canRegister = isOpen && !isFull && registrationRequired && !isPastDeadline;
 
             return (
               <Card key={comp.id} className="border-border">
@@ -62,7 +79,7 @@ export default async function LombaList() {
                     </Link>
                   ) : (
                     <Link href={`/lomba/${comp.slug}`} className="w-full inline-block text-center bg-arang/5 hover:bg-arang/10 text-arang/80 py-3 rounded-[12px] font-bold transition-colors">
-                      {isFull ? "Kuota Penuh (Lihat Detail)" : "Ditutup (Lihat Detail)"}
+                      {isPastDeadline ? "Batas Waktu Terlewati (Lihat Detail)" : isFull ? "Kuota Penuh (Lihat Detail)" : "Ditutup (Lihat Detail)"}
                     </Link>
                   )}
                 </CardContent>
@@ -80,3 +97,4 @@ export default async function LombaList() {
     </main>
   );
 }
+

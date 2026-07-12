@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const competitions = await prisma.competition.findMany({
     where: { status: { not: "DRAFT" } },
-    orderBy: { createdAt: "desc" },
+    orderBy: { name: "asc" },
   });
 
   const setting = await prisma.setting.findUnique({

@@ -424,5 +424,30 @@ export async function updateAnnouncementSettingAction(show: boolean) {
   }
 }
 
+export async function updateDeadlineSettingAction(deadlineISO: string) {
+  const authCookie = (await cookies()).get(ADMIN_AUTH_COOKIE);
+  if (authCookie?.value !== "authenticated") {
+    return { error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.setting.upsert({
+      where: { key: "registrationDeadline" },
+      update: { value: deadlineISO },
+      create: { key: "registrationDeadline", value: deadlineISO },
+    });
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/lomba");
+    revalidatePath("/lomba/[slug]", "page");
+    return { success: true };
+  } catch (err) {
+    console.error(err);
+    return { error: "Gagal memperbarui batas waktu pendaftaran" };
+  }
+}
+
+
 
 

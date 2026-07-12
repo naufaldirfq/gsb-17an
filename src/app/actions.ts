@@ -70,6 +70,14 @@ export async function registerAction(prevState: unknown, formData: FormData) {
       return { error: true, message: "Lomba tidak ditemukan." };
     }
 
+    const deadlineSetting = await prisma.setting.findUnique({
+      where: { key: "registrationDeadline" },
+    });
+    const deadlineStr = deadlineSetting?.value || "2026-07-31T23:59:59+07:00";
+    if (new Date() > new Date(deadlineStr)) {
+      return { error: true, message: "Pendaftaran sudah ditutup karena telah melewati batas waktu (deadline)." };
+    }
+
     if (!competition.registrationOpen || competition.status !== "REGISTRATION") {
       return { error: true, message: "Pendaftaran lomba ini sudah ditutup." };
     }
